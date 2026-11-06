@@ -1,0 +1,41 @@
+[
+  {
+    "level": 1,
+    "title": "Carteira",
+    "topics": "Carteiras, chaves, SOL e Devnet",
+    "steps": [],
+    "quiz": [],
+    "task": {
+      "type": "init_profile",
+      "title": "Cria o teu perfil on-chain",
+      "description": "Vais criar a tua conta de jogador. Ela guarda o teu nível, pontos e itens, e paga um pequeno rent em SOL.",
+      "button": "Criar perfil"
+    }
+  },
+  {
+    "level": 2,
+    "title": "Transacções",
+    "topics": "Assinaturas, taxas, lamports e Explorer",
+    "steps": [],
+    "quiz": [],
+    "task": {
+      "type": "complete_level_2",
+      "title": "Envia 0,01 SOL",
+      "description": "A transferência é feita pela instrução do programa que conclui o nível. Escolhe um endereço que não seja o teu.",
+      "button": "Enviar 0,01 SOL"
+    }
+  },
+  {
+    "level": 3,
+    "title": "Contas",
+    "topics": "Contas, rent, programas e PDAs",
+    "steps": [],
+    "quiz": [],
+    "task": {
+      "type": "complete_level_3",
+      "title": "Cria uma nota on-chain",
+      "description": "A nota vai viver numa PDA derivada da tua carteira. Escreve o que quiseres, até 100 caracteres.",
+      "button": "Criar nota"
+    }
+  }
+]

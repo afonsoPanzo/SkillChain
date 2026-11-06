@@ -1,0 +1,209 @@
+@import "tailwindcss";
+
+/* Design tokens from design/README.md */
+@theme {
+  --color-ink: #0e0f14;
+  --color-surface: #171922;
+  --color-surface-2: #20232f;
+  --color-line: #2a2e3b;
+  --color-divider: #1c1e27;
+
+  --color-fg: #f2f1ec;
+  --color-fg-2: #c9cad2;
+  --color-fg-3: #b9bac4;
+  --color-muted: #9a9ca8;
+  --color-dim: #5a5d6a;
+
+  --color-lime: #14f195;
+  --color-lime-d: #0b9a5e;
+  --color-lime-h: #5cffb8;
+  --color-violet: #a15cff;
+  --color-violet-b: #3d2466;
+  --color-sol-purple: #9945ff;
+  --color-coral: #ff6b5e;
+  --color-coral-d: #b5443a;
+  --color-coral-t: #ff8a7e;
+  --color-press: #0a0b0f;
+
+  --animate-pulse-dot: pulse-dot 1s ease-in-out infinite;
+  --animate-rise: rise 0.25s ease-out;
+  --animate-burst: burst 0.6s ease;
+
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+  @keyframes rise {
+    from {
+      transform: translateY(24px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes burst {
+    0% {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.08);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+}
+
+@theme inline {
+  --font-sans: var(--font-bricolage), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--color-ink);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--color-lime);
+  text-decoration: none;
+}
+a:hover {
+  color: #7dffc6;
+  text-decoration: underline;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-violet);
+  outline-offset: 2px;
+}
+
+/* "3D" buttons, as in the design */
+@layer components {
+  .btn {
+    height: 58px;
+    border: none;
+    border-radius: 16px;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.05s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+  .btn:hover {
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--color-lime);
+    color: var(--color-ink);
+    box-shadow: 0 5px 0 var(--color-lime-d);
+  }
+  .btn-primary:hover {
+    color: var(--color-ink);
+  }
+  .btn:active:not(:disabled) {
+    transform: translateY(5px);
+    box-shadow: none;
+  }
+  .btn:disabled {
+    background: var(--color-surface-2);
+    color: var(--color-muted);
+    box-shadow: 0 5px 0 var(--color-press);
+    cursor: not-allowed;
+  }
+}
+
+/* @solana/wallet-adapter button and modal, themed with the app tokens */
+.wallet-adapter-button-trigger {
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  background-color: var(--color-surface);
+  color: var(--color-fg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 32px;
+}
+.wallet-adapter-button-trigger:not([disabled]):hover {
+  background-color: var(--color-surface);
+  border-color: var(--color-lime);
+}
+.wallet-adapter-button-trigger .wallet-adapter-button-start-icon,
+.wallet-adapter-button-trigger .wallet-adapter-button-start-icon img {
+  width: 16px;
+  height: 16px;
+}
+.wallet-adapter-button-trigger .wallet-adapter-button-start-icon {
+  margin-right: 8px;
+}
+.wallet-adapter-dropdown-list {
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background: var(--color-surface-2);
+}
+.wallet-adapter-dropdown-list-item {
+  color: var(--color-fg);
+  font-size: 13px;
+  font-weight: 600;
+}
+.wallet-adapter-dropdown-list-item:not([disabled]):hover {
+  background-color: var(--color-line);
+}
+.wallet-adapter-modal {
+  background: rgb(0 0 0 / 0.6);
+}
+.wallet-adapter-modal-wrapper {
+  border: 1px solid var(--color-line);
+  border-radius: 18px;
+  background: var(--color-surface);
+  color: var(--color-fg);
+}
+.wallet-adapter-modal-title {
+  padding: 48px 32px 24px;
+  color: var(--color-fg);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+.wallet-adapter-modal-list .wallet-adapter-button {
+  color: var(--color-fg);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.wallet-adapter-modal-list .wallet-adapter-button:not([disabled]):hover {
+  background-color: var(--color-surface-2);
+}
+.wallet-adapter-modal-button-close {
+  background: var(--color-surface-2);
+}
+.wallet-adapter-modal-button-close svg {
+  fill: var(--color-muted);
+}
+.wallet-adapter-modal [role="alert"],
+.wallet-adapter-modal [role="status"] {
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}

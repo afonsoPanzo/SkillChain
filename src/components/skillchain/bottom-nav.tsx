@@ -1,0 +1,46 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useWallet } from "@solana/wallet-adapter";
+
+const TABS = [
+  { href: "/learn", label: "Aprender" },
+  { href: "/shop", label: "Loja" },
+  { href: "/profile", label: "Perfil" },
+  { href: "/leaderboard", label: "Ranking" },
+] as const;
+
+export function BottomNav() {
+  const pathname = usePathname();
+  const { connected } = useWallet();
+
+  // Hidden while the player is inside a level, as in the design.
+  const inLesson = /^\/learn\/\d+/.test(pathname);
+  if (!connected || inLesson) return null;
+
+  return (
+    <nav
+      aria-label="Navegação principal"
+      className="sticky bottom-0 z-10 grid grid-cols-4 border-t border-divider bg-ink/95 backdrop-blur-[10px]"
+    >
+      {TABS.map((tab) => {
+        const active = pathname === tab.href || pathname.startsWith(`${tab.href}/`);
+        return (
+          <Link
+            key={tab.href}
+            href={tab.href}
+            aria-current={active ? "page" : undefined}
+            className={`flex h-[60px] items-center justify-center border-t-2 text-sm font-bold hover:no-underline ${
+              active
+                ? "border-lime text-lime hover:text-lime"
+                : "border-transparent text-muted hover:text-fg"
+            }`}
+          >
+            {tab.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
