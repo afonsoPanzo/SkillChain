@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#0E0F14;color:#F2F1EC;font-family:'Bricolage Grotesque',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#14F195;text-decoration:none}
+a:hover{color:#7DFFC6;text-decoration:underline}
+button,input,textarea{font-family:inherit}
+@keyframes scpulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes scpopA{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+@keyframes scpopB{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+@keyframes scshakeA{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes scshakeB{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes scrise{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes scburst{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#0E0F14;display:flex;justify-content:center">
+<div style="width:100%;max-width:480px;min-height:100vh;display:flex;flex-direction:column;border-left:1px solid #1C1E27;border-right:1px solid #1C1E27">
+
+  <header style="position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:rgba(14,15,20,.92);backdrop-filter:blur(10px);border-bottom:1px solid #1C1E27">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="font-weight:800;font-size:19px;letter-spacing:-0.02em">Skill<span style="background:linear-gradient(90deg,#9945FF,#14F195);-webkit-background-clip:text;background-clip:text;color:transparent">Chain</span></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#A15CFF;border:1px solid #3D2466;border-radius:999px;padding:3px 7px">Devnet</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <sc-if value="{{ connected }}" hint-placeholder-val="{{ false }}">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#14F195">{{ pointsLabel }}</div>
+        <button onClick="{{ goProfile }}" style="width:34px;height:34px;padding:0;border:none;background:none;cursor:pointer">
+          <dc-import name="Avatar" hue="{{ myHue }}" frame="{{ myFrame }}" accessory="{{ myAcc }}" hint-size="34px,34px"></dc-import>
+        </button>
+      </sc-if>
+      <button onClick="{{ toggleLang }}" style="height:34px;padding:0 10px;border-radius:10px;border:1px solid #2A2E3B;background:#171922;color:#F2F1EC;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;cursor:pointer" style-hover="border-color:#14F195">{{ langLabel }}</button>
+    </div>
+  </header>
+
+  <main style="flex:1;padding:22px 18px 32px;display:flex;flex-direction:column;gap:20px">
+
+    <sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:28px;padding-top:20px">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9A9CA8">{{ t.landingKicker }}</div>
+          <h1 style="margin:0;font-size:46px;line-height:1.0;font-weight:800;letter-spacing:-0.035em;text-wrap:balance">{{ t.heroA }} <span style="color:#14F195">{{ t.heroB }}</span></h1>
+          <p style="margin:0;font-size:17px;line-height:1.5;color:#B9BAC4;text-wrap:pretty">{{ t.heroSub }}</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+          <sc-for list="{{ loop }}" as="l" hint-placeholder-count="3">
+            <div style="background:#171922;border:1px solid #2A2E3B;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#14F195">{{ l.n }}</div>
+              <div style="font-size:15px;font-weight:700">{{ l.title }}</div>
+              <div style="font-size:13px;color:#9A9CA8;line-height:1.35">{{ l.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <button onClick="{{ connect }}" style="height:58px;border:none;border-radius:16px;background:#14F195;color:#0E0F14;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 5px 0 #0B9A5E" style-active="transform:translateY(5px);box-shadow:0 0 0 #0B9A5E">{{ t.connect }}</button>
+          <div style="font-size:14px;color:#9A9CA8;text-align:center">{{ t.faucetPre }} <a href="https://faucet.solana.com" target="_blank">{{ t.faucetLink }}</a></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isLearn }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9A9CA8">{{ t.learnKicker }}</div>
+        <h2 style="margin:0;font-size:32px;font-weight:800;letter-spacing:-0.03em">{{ t.learnTitle }}</h2>
+        <div style="font-size:15px;color:#9A9CA8">{{ progressLabel }}</div>
+      </div>
+
+      <sc-if value="{{ showMissions }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#171922;border:1px solid #2A2E3B;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+            <div style="font-size:17px;font-weight:800">{{ t.missionsTitle }}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9A9CA8">{{ resetLabel }}</div>
+          </div>
+          <sc-for list="{{ missions }}" as="m" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:26px;height:26px;flex:none;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;background:{{ m.checkBg }};color:#0E0F14;border:1.5px solid {{ m.checkBorder }}">{{ m.check }}</div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between;gap:10px;font-size:14px">
+                  <span style="color:{{ m.color }}">{{ m.label }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace;color:#9A9CA8;flex:none">{{ m.count }}</span>
+                </div>
+                <div style="height:6px;border-radius:3px;background:#0E0F14;overflow:hidden"><div style="height:100%;border-radius:3px;background:#14F195;width:{{ m.pct }};transition:width .5s ease"></div></div>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ perfectDay }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:14px;font-weight:700;color:#14F195;animation:scburst .5s ease">{{ t.perfectDay }}</div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ levelCards }}" as="c" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column">
+            <button onClick="{{ c.open }}" style="display:flex;gap:14px;align-items:center;text-align:left;width:100%;background:#171922;border:1.5px solid {{ c.cardBorder }};border-radius:18px;padding:16px;color:#F2F1EC;cursor:{{ c.cursor }};box-shadow:0 4px 0 {{ c.shadow }}" style-active="transform:translateY(3px)">
+              <div style="width:52px;height:52px;flex:none;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;background:{{ c.numBg }};color:{{ c.numColor }}">{{ c.n }}</div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                <div style="font-size:19px;font-weight:700;color:{{ c.titleColor }}">{{ c.title }}</div>
+                <div style="font-size:13px;color:#9A9CA8;line-height:1.35">{{ c.topics }}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:{{ c.ptsColor }}">{{ c.points }}</div>
+                <div style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:{{ c.chipBg }};color:{{ c.chipColor }}">{{ c.statusLabel }}</div>
+              </div>
+            </button>
+            <sc-if value="{{ c.notLast }}" hint-placeholder-val="{{ true }}">
+              <div style="width:2px;height:20px;margin-left:42px;background:{{ c.lineColor }}"></div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ hasProfile }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ goShop }}" style="text-align:left;background:#171922;border:1px solid #2A2E3B;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;color:#F2F1EC;cursor:pointer" style-hover="border-color:#14F195">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">
+            <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#A15CFF">{{ t.nextReward }}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#9A9CA8">{{ reward.count }}</div>
+          </div>
+          <div style="font-size:17px;font-weight:700">{{ reward.text }}</div>
+          <div style="height:10px;border-radius:5px;background:#0E0F14;overflow:hidden"><div style="height:100%;border-radius:5px;background:#A15CFF;width:{{ reward.pct }};transition:width .6s ease"></div></div>
+        </button>
+      </sc-if>
+
+      <sc-if value="{{ showRival }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ rivalAction }}" style="display:flex;align-items:center;gap:12px;text-align:left;background:#171922;border:1px solid #2A2E3B;border-radius:18px;padding:12px 16px 12px 12px;color:#F2F1EC;cursor:pointer" style-hover="border-color:#14F195">
+          <div style="width:44px;height:44px;flex:none"><dc-import name="Avatar" hue="{{ rival.hue }}" frame="{{ rival.frame }}" accessory="{{ rival.acc }}" hint-size="44px,44px"></dc-import></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+            <div style="font-size:15px;font-weight:700">{{ rival.text }}</div>
+            <div style="font-size:13px;color:#9A9CA8">{{ rival.sub }}</div>
+          </div>
+          <div style="font-size:18px;color:#14F195">→</div>
+        </button>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ isLesson }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <button onClick="{{ goLearn }}" style="background:none;border:none;padding:8px 0;color:#9A9CA8;font-size:15px;cursor:pointer" style-hover="color:#F2F1EC">{{ t.back }}</button>
+          <div style="display:flex;align-items:center;gap:12px">
+            <sc-if value="{{ showCombo }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#0E0F14;background:#14F195;border-radius:999px;padding:3px 9px;animation:{{ comboAnim }}">{{ comboLabel }}</div>
+            </sc-if>
+            <div style="display:flex;gap:3px;animation:{{ shakeAnim }}">
+              <sc-for list="{{ hearts }}" as="h" hint-placeholder-count="3">
+                <svg width="20" height="20" viewBox="0 0 24 24" style="display:block"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="{{ h.fill }}"></path></svg>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:4px">
+          <sc-for list="{{ segments }}" as="sg" hint-placeholder-count="6">
+            <div style="flex:1;height:6px;border-radius:3px;background:{{ sg.color }};transition:background .3s"></div>
+          </sc-for>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9A9CA8">{{ lessonTag }}</div>
+      </div>
+
+      <sc-if value="{{ stageSteps }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:20px;flex:1">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#14F195">{{ stepCounter }}</div>
+          <h2 style="margin:0;font-size:34px;line-height:1.05;font-weight:800;letter-spacing:-0.03em;text-wrap:balance">{{ stepTitle }}</h2>
+          <p style="margin:0;font-size:18px;line-height:1.55;color:#C9CAD2;text-wrap:pretty">{{ stepBody }}</p>
+          <sc-if value="{{ stepHasTerm }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#171922;border:1px solid #2A2E3B;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#A15CFF">{{ t.practice }}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;color:#F2F1EC;white-space:pre-line;word-break:break-all">{{ stepTerm }}</div>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:flex;gap:10px">
+          <sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ prevStep }}" style="height:58px;padding:0 20px;border:1px solid #2A2E3B;border-radius:16px;background:#171922;color:#F2F1EC;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 5px 0 #0A0B0F" style-active="transform:translateY(5px);box-shadow:none">{{ t.prev }}</button>
+          </sc-if>
+          <button onClick="{{ nextStep }}" style="flex:1;height:58px;border:none;border-radius:16px;background:#14F195;color:#0E0F14;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 5px 0 #0B9A5E" style-active="transform:translateY(5px);box-shadow:none">{{ nextLabel }}</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ stageQuiz }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:18px;flex:1">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;gap:10px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase">
+              <span style="color:#14F195">{{ quizCounter }}</span>
+              <span style="color:{{ timerColor }}">{{ timerLabel }}</span>
+            </div>
+            <div style="height:6px;border-radius:3px;background:#20232F;overflow:hidden"><div style="height:100%;background:{{ timerColor }};width:{{ timerPct }};transition:width .1s linear"></div></div>
+          </div>
+          <h2 style="margin:0;font-size:28px;line-height:1.1;font-weight:800;letter-spacing:-0.025em;text-wrap:balance">{{ quizQuestion }}</h2>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ quizOptions }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.pick }}" style="display:flex;align-items:center;gap:14px;text-align:left;min-height:58px;padding:14px 16px;border-radius:16px;border:2px solid {{ o.border }};background:{{ o.bg }};color:#F2F1EC;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 0 {{ o.shadow }}" style-active="transform:translateY(4px);box-shadow:none">
+                <span style="width:28px;height:28px;flex:none;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;background:{{ o.keyBg }};color:{{ o.keyColor }}">{{ o.key }}</span>
+                <span>{{ o.text }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ hasPicked }}" hint-placeholder-val="{{ false }}">
+          <div style="margin:0 -18px -32px;padding:20px 18px 28px;background:{{ feedbackBg }};border-top:2px solid {{ feedbackColor }};display:flex;flex-direction:column;gap:14px;animation:scrise .25s ease-out">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="font-size:20px;font-weight:800;color:{{ feedbackColor }}">{{ feedbackTitle }}</div>
+              <div style="font-size:15px;line-height:1.45;color:#C9CAD2">{{ feedbackBody }}</div>
+            </div>
+            <button onClick="{{ quizAction }}" style="height:58px;border:none;border-radius:16px;background:{{ feedbackColor }};color:#0E0F14;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 5px 0 {{ feedbackShadow }}" style-active="transform:translateY(5px);box-shadow:none">{{ quizBtnLabel }}</button>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ stageNoLives }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:24px 0">
+          <div style="display:flex;gap:6px">
+            <svg width="36" height="36" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#2A2E3B"></path></svg>
+            <svg width="36" height="36" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#2A2E3B"></path></svg>
+            <svg width="36" height="36" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#2A2E3B"></path></svg>
+          </div>
+          <div style="font-size:30px;font-weight:800;letter-spacing:-0.03em">{{ t.noLivesTitle }}</div>
+          <div style="font-size:16px;line-height:1.5;color:#9A9CA8;max-width:320px">{{ t.noLivesSub }}</div>
+        </div>
+        <button onClick="{{ reviewLesson }}" style="height:58px;border:none;border-radius:16px;background:#14F195;color:#0E0F14;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 5px 0 #0B9A5E" style-active="transform:translateY(5px);box-shadow:none">{{ t.reviewBtn }}</button>
+      </sc-if>
+
+      <sc-if value="{{ stageTask }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:20px;flex:1">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#14F195">{{ t.taskKicker }} · {{ lessonPoints }}</div>
+            <h2 style="margin:0;font-size:30px;line-height:1.08;font-weight:800;letter-spacing:-0.03em;text-wrap:balance">{{ taskTitle }}</h2>
+            <p style="margin:0;font-size:16px;line-height:1.5;color:#B9BAC4;text-wrap:pretty">{{ taskBody }}</p>
+          </div>
+          <sc-if value="{{ alreadyDone }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#171922;border:1px solid #2A2E3B;border-radius:14px;padding:16px;font-size:15px;color:#B9BAC4">{{ t.alreadyDone }}</div>
+          </sc-if>
+          <sc-if value="{{ showT1 }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#171922;border:1px solid #2A2E3B;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+                <div style="font-size:14px;color:#9A9CA8">{{ t.balanceLbl }}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:{{ balanceColor }}">{{ balanceLabel }}</div>
+              </div>
+              <sc-if value="{{ noBalance }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid #2A2E3B;padding-top:14px">
+                  <div style="font-size:15px;line-height:1.45">{{ t.needSol }}</div>
+                  <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+                    <button onClick="{{ airdrop }}" style="height:44px;padding:0 16px;border:1.5px solid #14F195;border-radius:12px;background:transparent;color:#14F195;font-size:15px;font-weight:700;cursor:pointer">{{ t.askSol }}</button>
+                    <a href="https://faucet.solana.com" target="_blank" style="font-size:15px">{{ t.openFaucet }}</a>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showT2 }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <label style="font-size:14px;color:#9A9CA8">{{ t.recipientLbl }}</label>
+              <input value="{{ recipient }}" onChange="{{ onRecipient }}" placeholder="{{ t.recipientPh }}" spellcheck="false" style="height:52px;padding:0 14px;border-radius:12px;border:1.5px solid {{ recipientBorder }};background:#171922;color:#F2F1EC;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none">
+              <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px">
+                <span style="color:{{ recipientHintColor }}">{{ recipientHint }}</span>
+                <button onClick="{{ fillExample }}" style="background:none;border:none;padding:0;color:#A15CFF;font-size:13px;cursor:pointer;flex:none">{{ t.useExample }}</button>
+              </div>
+              <sc-if value="{{ recipientValid }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#171922;border:1px solid #2A2E3B;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:15px">{{ t.sendPre }} <b style="color:#14F195">{{ t.amount }}</b> {{ t.sendTo }} <span style="font-family:'JetBrains Mono',monospace">{{ recipientShort }}</span></div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9A9CA8">{{ t.lamportsNote }}</div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showT3 }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <label style="font-size:14px;color:#9A9CA8">{{ t.noteLbl }}</label>
+              <textarea value="{{ message }}" onChange="{{ onMessage }}" placeholder="{{ t.notePh }}" rows="3" style="padding:14px;border-radius:12px;border:1.5px solid #2A2E3B;background:#171922;color:#F2F1EC;font-size:16px;line-height:1.45;resize:none;outline:none"></textarea>
+              <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;font-family:'JetBrains Mono',monospace">
+                <span style="color:#9A9CA8">seeds: ["note", {{ myShort }}]</span>
+                <span style="color:{{ msgCountColor }}">{{ msgCount }}</span>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showTx }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#171922;border:1px solid #2A2E3B;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ txRows }}" as="r" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ r.dot }};animation:{{ r.anim }}"></div>
+                  <div style="font-size:15px;color:{{ r.color }}">{{ r.label }}</div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ txIsError }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:15px;color:#FF8A7E;border-top:1px solid #2A2E3B;padding-top:12px">{{ txError }}</div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+        <sc-if value="{{ showTaskBtn }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ taskAction }}" style="height:58px;border:none;border-radius:16px;background:{{ taskBtnBg }};color:{{ taskBtnColor }};font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 5px 0 {{ taskBtnShadow }}" style-active="transform:translateY(5px);box-shadow:none">{{ taskBtnLabel }}</button>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ stageDone }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:16px 0">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9A9CA8">{{ doneTag }}</div>
+          <div style="font-size:80px;line-height:.9;font-weight:800;letter-spacing:-0.04em;color:#14F195;animation:scburst .6s ease">{{ doneGain }}</div>
+          <div style="font-size:18px">{{ t.pointsEarned }}</div>
+          <div style="width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px">
+            <div style="background:#171922;border:1px solid #2A2E3B;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:2px">
+              <div style="font-size:12px;color:#9A9CA8">{{ t.bestCombo }}</div>
+              <div style="font-size:24px;font-weight:800">{{ bestComboLabel }}</div>
+            </div>
+            <div style="background:#171922;border:1px solid #2A2E3B;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:2px">
+              <div style="font-size:12px;color:#9A9CA8">{{ t.heartsLeft }}</div>
+              <div style="font-size:24px;font-weight:800">{{ heartsLeftLabel }}</div>
+            </div>
+          </div>
+          <div style="width:100%;background:#171922;border:1px solid #2A2E3B;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px;text-align:left">
+            <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#A15CFF">{{ t.proof }}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;word-break:break-all">{{ sigShort }}</div>
+            <a href="{{ explorerUrl }}" target="_blank" style="font-size:15px;font-weight:700">{{ t.viewExplorer }}</a>
+          </div>
+        </div>
+        <button onClick="{{ doneAction }}" style="height:58px;border:none;border-radius:16px;background:#14F195;color:#0E0F14;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 5px 0 #0B9A5E" style-active="transform:translateY(5px);box-shadow:none">{{ doneLabel }}</button>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ isShop }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9A9CA8">{{ t.shopKicker }}</div>
+        <h2 style="margin:0;font-size:32px;font-weight:800;letter-spacing:-0.03em">{{ t.shopHavePre }} <span style="color:#14F195">{{ pointsNum }}</span> {{ t.shopHavePost }}</h2>
+        <div style="font-size:15px;color:#9A9CA8;line-height:1.45">{{ t.shopSub }}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+        <sc-for list="{{ shopItems }}" as="it" hint-placeholder-count="4">
+          <div style="background:#171922;border:1.5px solid {{ it.border }};border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:12px">
+            <div style="aspect-ratio:1;border-radius:12px;background:#0E0F14;display:flex;align-items:center;justify-content:center;padding:14px">
+              <sc-if value="{{ it.notTitle }}" hint-placeholder-val="{{ true }}">
+                <div style="width:100%;height:100%"><dc-import name="Avatar" hue="{{ myHue }}" frame="{{ it.pFrame }}" accessory="{{ it.pAcc }}" hint-size="100%,100%"></dc-import></div>
+              </sc-if>
+              <sc-if value="{{ it.isTitle }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:15px;font-weight:700;color:#A15CFF;border:1.5px solid #A15CFF;border-radius:999px;padding:6px 12px;text-align:center">{{ it.name }}</div>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px;padding:0 2px">
+              <div style="font-size:16px;font-weight:700;line-height:1.2">{{ it.name }}</div>
+              <div style="font-size:13px;color:#9A9CA8">{{ it.meta }}</div>
+            </div>
+            <div style="height:6px;border-radius:3px;background:#0E0F14;overflow:hidden"><div style="height:100%;border-radius:3px;background:{{ it.barColor }};width:{{ it.pct }}"></div></div>
+            <button onClick="{{ it.buy }}" style="height:44px;border:none;border-radius:12px;background:{{ it.btnBg }};color:{{ it.btnColor }};font-size:14px;font-weight:800;cursor:{{ it.cursor }};box-shadow:0 4px 0 {{ it.btnShadow }}" style-active="transform:translateY(4px);box-shadow:none">{{ it.label }}</button>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ noProfile }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:48px 8px">
+          <div style="font-size:24px;font-weight:800;letter-spacing:-0.02em">{{ t.noProfileTitle }}</div>
+          <div style="font-size:16px;color:#9A9CA8;line-height:1.5">{{ t.noProfileSub }}</div>
+          <button onClick="{{ goLearn }}" style="height:52px;padding:0 22px;border:none;border-radius:14px;background:#14F195;color:#0E0F14;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 0 #0B9A5E">{{ t.startL1 }}</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasProfile }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:8px">
+          <div style="width:168px;height:168px"><dc-import name="Avatar" hue="{{ myHue }}" frame="{{ myFrame }}" accessory="{{ myAcc }}" hint-size="168px,168px"></dc-import></div>
+          <sc-if value="{{ hasTitle }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:14px;font-weight:700;color:#A15CFF;border:1.5px solid #A15CFF;border-radius:999px;padding:4px 12px">{{ titleText }}</div>
+          </sc-if>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#9A9CA8">{{ myShort }}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+          <div style="background:#171922;border:1px solid #2A2E3B;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px">
+            <div style="font-size:12px;color:#9A9CA8">{{ t.level }}</div>
+            <div style="font-size:26px;font-weight:800">{{ levelNum }}<span style="font-size:15px;color:#9A9CA8;font-weight:500"> / 3</span></div>
+          </div>
+          <div style="background:#171922;border:1px solid #2A2E3B;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px">
+            <div style="font-size:12px;color:#9A9CA8">{{ t.points }}</div>
+            <div style="font-size:26px;font-weight:800;color:#14F195">{{ pointsNum }}</div>
+          </div>
+          <div style="background:#171922;border:1px solid #2A2E3B;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px">
+            <div style="font-size:12px;color:#9A9CA8">{{ t.totalEarned }}</div>
+            <div style="font-size:26px;font-weight:800">{{ totalNum }}</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9A9CA8">{{ t.inventory }}</div>
+          <sc-if value="{{ noItems }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#171922;border:1px dashed #2A2E3B;border-radius:14px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+              <div style="font-size:15px;color:#9A9CA8">{{ t.noItems }}</div>
+              <button onClick="{{ goShop }}" style="background:none;border:none;color:#14F195;font-size:15px;font-weight:700;cursor:pointer">{{ t.goShop }}</button>
+            </div>
+          </sc-if>
+          <sc-for list="{{ inventory }}" as="iv" hint-placeholder-count="0">
+            <div style="background:#171922;border:1px solid {{ iv.border }};border-radius:14px;padding:12px 12px 12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <div style="font-size:16px;font-weight:700">{{ iv.name }}</div>
+                <div style="font-size:13px;color:#9A9CA8">{{ iv.cat }}</div>
+              </div>
+              <button onClick="{{ iv.toggle }}" style="height:40px;padding:0 14px;border-radius:10px;border:1px solid {{ iv.btnBorder }};background:{{ iv.btnBg }};color:{{ iv.btnColor }};font-size:14px;font-weight:700;cursor:pointer">{{ iv.label }}</button>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ hasNote }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9A9CA8">{{ t.noteTitle }}</div>
+            <div style="background:#171922;border:1px solid #2A2E3B;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:17px;line-height:1.45">“{{ noteText }}”</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9A9CA8">PDA ["note", {{ myShort }}]</div>
+            </div>
+          </div>
+        </sc-if>
+      </sc-if>
+      <button onClick="{{ toggleSound }}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;background:#171922;border:1px solid #2A2E3B;border-radius:14px;padding:14px 16px;color:#F2F1EC;font-size:15px;cursor:pointer">
+        <span>{{ t.soundLbl }}</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:{{ soundColor }}">{{ soundState }}</span>
+      </button>
+    </sc-if>
+
+    <sc-if value="{{ isBoard }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9A9CA8">{{ t.boardKicker }}</div>
+        <h2 style="margin:0;font-size:32px;font-weight:800;letter-spacing:-0.03em">{{ t.boardTitle }}</h2>
+        <div style="font-size:15px;color:#9A9CA8">{{ t.boardSub }}</div>
+      </div>
+      <sc-if value="{{ showRival }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ rivalAction }}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;background:rgba(20,241,149,.08);border:1.5px solid #14F195;border-radius:16px;padding:14px 16px;color:#F2F1EC;cursor:pointer">
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <div style="font-size:16px;font-weight:800">{{ rival.text }}</div>
+            <div style="font-size:13px;color:#B9BAC4">{{ rival.sub }}</div>
+          </div>
+          <div style="font-size:18px;color:#14F195">→</div>
+        </button>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <sc-for list="{{ board }}" as="b" hint-placeholder-count="8">
+          <div style="display:grid;grid-template-columns:28px 40px minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 14px 10px 10px;border-radius:14px;background:{{ b.bg }};border:1px solid {{ b.border }}">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;text-align:center;color:{{ b.posColor }}">{{ b.pos }}</div>
+            <div style="width:40px;height:40px"><dc-import name="Avatar" hue="{{ b.hue }}" frame="{{ b.frame }}" accessory="{{ b.acc }}" hint-size="40px,40px"></dc-import></div>
+            <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:13px">{{ b.addr }}</div>
+              <div style="font-size:12px;color:#9A9CA8">{{ b.sub }}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+              <div style="font-size:15px;font-weight:700">{{ b.levelLabel }}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9A9CA8">{{ b.total }} pts</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{ connected }}" hint-placeholder-val="{{ false }}">
+    <div style="position:sticky;bottom:0;z-index:5;display:flex;flex-direction:column">
+      <sc-if value="{{ showToast }}" hint-placeholder-val="{{ false }}">
+        <div style="margin:0 16px 10px;padding:14px 16px;border-radius:14px;background:#20232F;border:1px solid {{ toastBorder }};display:flex;align-items:center;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,.4);animation:scrise .25s ease-out">
+          <div style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ toastDot }};animation:{{ toastAnim }}"></div>
+          <div style="flex:1;font-size:15px">{{ toastText }}</div>
+          <sc-if value="{{ toastHasLink }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ explorerUrl }}" target="_blank" style="font-size:14px;font-weight:700">Explorer ↗</a>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <nav style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:rgba(14,15,20,.96);backdrop-filter:blur(10px);border-top:1px solid #1C1E27">
+          <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="4">
+            <button onClick="{{ tb.go }}" style="height:60px;background:none;border:none;border-top:2px solid {{ tb.bar }};color:{{ tb.color }};font-size:14px;font-weight:700;cursor:pointer">{{ tb.label }}</button>
+          </sc-for>
+        </nav>
+      </sc-if>
+    </div>
+  </sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;en&quot;,&quot;pt&quot;],&quot;default&quot;:&quot;en&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Game&quot;},&quot;sound&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Game&quot;},&quot;missions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Game&quot;},&quot;startLevel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[0,1,2,3],&quot;default&quot;:0,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Demo&quot;},&quot;txOutcome&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;success&quot;,&quot;error&quot;,&quot;cancelled&quot;],&quot;default&quot;:&quot;success&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo&quot;},&quot;noSol&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Demo&quot;}}">
+const QTIME = 20000;
+const L10N = {
+  en: {
+    landingKicker: '3 levels · 450 points · 100% on-chain', heroA: 'Learn Solana', heroB: 'by playing.',
+    heroSub: 'Every level ends with a real task on the blockchain. The transaction you sign is the proof you passed.',
+    loop: [['Read', 'Short screens'], ['Answer', 'Timed quiz'], ['Sign', 'On-chain task']],
+    connect: 'Connect wallet', faucetPre: 'No test SOL?', faucetLink: 'Get some from the Devnet faucet.',
+    learnKicker: 'Path', learnTitle: 'Learn Solana', progress: '{a} of 3 levels done · {b} of 450 points',
+    missionsTitle: "Today's missions", resets: 'Resets in {h}h {m}m', perfectDay: 'Perfect day. All missions done.',
+    m1: 'Finish 1 quiz', m2: 'Hit a 5x combo', m3: 'Answer 3 questions in under 5 s',
+    nextReward: 'Next reward', rewardBuy: 'You can unlock {x} now', rewardNeed: '{n} pts to {x}', rewardLevel: '{x} unlocks at level {n}', rewardAll: 'You own every item',
+    rivalPass: '+{n} pts to pass {who}', rivalPassSub: 'Finish level {l} to overtake', rivalTie: 'Tied with {who}', rivalTieSub: 'Same level, same points. Stay sharp.', rivalTop: "You're #1", rivalTopSub: 'Nobody is ahead of you',
+    status: { done: 'Done', available: 'Play', locked: 'Locked' },
+    back: '← Map', prev: 'Back', practice: 'In practice', step: 'Step {a} of {b}', next: 'Next', toQuiz: 'Start quiz',
+    quiz: 'Question {a} of {b}', right: ['Nice!', 'Correct!', 'Exactly.'], wrong: 'Not quite.', wrongSub: 'You lost a heart. Read it again and try once more.',
+    timeout: "Time's up!", timeoutSub: 'You lost a heart. Be quicker this time.', fast: ' Lightning fast.',
+    cont: 'Continue', unlock: 'Unlock the task', retry: 'Try again', combo: '{n}x combo',
+    noLivesTitle: 'Out of hearts', noLivesSub: 'Go over the lesson again. Your hearts refill when you start over.', reviewBtn: 'Review the lesson',
+    taskKicker: 'On-chain task', alreadyDone: "You've already completed this level on-chain. Each level can only be completed once.",
+    balanceLbl: 'Devnet balance', needSol: 'You need test SOL to pay rent for the account.', askSol: 'Request 2 SOL', openFaucet: 'Open faucet ↗',
+    recipientLbl: 'Recipient address', recipientPh: 'Paste a Solana address', useExample: 'Use example',
+    rHint: 'Base58 Solana address', rSelf: "The recipient can't be your own wallet.", rBad: 'Invalid address.', rOk: 'Valid address',
+    sendPre: "You'll send", amount: '0.01 SOL', sendTo: 'to', lamportsNote: '= 10,000,000 lamports + 5,000 fee',
+    noteLbl: 'Your on-chain note', notePh: 'Write a message to live on the blockchain',
+    tx: ['Sign in wallet', 'Confirming on Devnet', 'Confirmed'], signing: 'Waiting for signature…', confirming: 'Confirming…',
+    cancelled: 'Transaction cancelled.', errs: ["The previous level hasn't been completed yet.", "The recipient can't be your own wallet.", 'The message must be 1 to 100 characters.'],
+    errPoints: "You don't have enough points.", errNotOwned: "You don't own this item yet.",
+    doneTag: 'Level {n} complete', pointsEarned: 'points earned', bestCombo: 'Best combo', heartsLeft: 'Hearts left',
+    proof: 'On-chain proof', viewExplorer: 'View on Solana Explorer ↗', nextLevel: 'Start level {n}', toShop: 'Go to the shop',
+    shopKicker: 'Shop', shopHavePre: 'You have', shopHavePost: 'points', shopSub: 'You can earn 450 in total. Items cost 700. Choose wisely.',
+    cat: ['Frame', 'Accessory', 'Title'], owned: 'Owned', needLvl: 'Requires level {n}', needPts: '{n} pts to go', buy: 'Buy · {n}', needProfile: 'Finish level 1', buying: 'Signing…',
+    bought: '{x} bought · −{n} pts', equipped: '{x} equipped', unequipped: '{x} unequipped', equippedTag: ' · equipped', equip: 'Equip', unequip: 'Unequip',
+    noProfileTitle: "You don't have a profile yet", noProfileSub: 'Your profile is created on-chain when you finish level 1.', startL1: 'Start level 1',
+    level: 'Level', points: 'Points', totalEarned: 'Total earned', inventory: 'Inventory', noItems: 'No items yet.', goShop: 'Go to shop', noteTitle: 'On-chain note',
+    soundLbl: 'Sound and vibration', on: 'ON', off: 'OFF',
+    boardKicker: 'Leaderboard', boardTitle: 'Top players', boardSub: 'Read straight from on-chain profiles. Level first, then total earned.', you: 'You', lv: 'Lv {n}',
+    tabs: ['Learn', 'Shop', 'Profile', 'Ranks'], waitSig: 'Waiting for wallet signature…', waitConf: 'Confirming on Devnet…'
+  },
+  pt: {
+    landingKicker: '3 níveis · 450 pontos · 100% on-chain', heroA: 'Aprende Solana', heroB: 'a jogar.',
+    heroSub: 'Cada nível termina com uma tarefa real na blockchain. A transacção que assinas é a prova de que passaste.',
+    loop: [['Lê', 'Ecrãs curtos'], ['Responde', 'Quiz cronometrado'], ['Assina', 'Tarefa on-chain']],
+    connect: 'Ligar carteira', faucetPre: 'Sem SOL de teste?', faucetLink: 'Pede no faucet da Devnet.',
+    learnKicker: 'Percurso', learnTitle: 'Aprende Solana', progress: '{a} de 3 níveis concluídos · {b} de 450 pontos',
+    missionsTitle: 'Missões de hoje', resets: 'Renova em {h}h {m}m', perfectDay: 'Dia perfeito. Todas as missões feitas.',
+    m1: 'Termina 1 quiz', m2: 'Faz um combo de 5', m3: 'Responde a 3 perguntas em menos de 5 s',
+    nextReward: 'Próxima recompensa', rewardBuy: 'Já podes desbloquear: {x}', rewardNeed: 'Faltam {n} pts para {x}', rewardLevel: '{x} desbloqueia no nível {n}', rewardAll: 'Já tens todos os itens',
+    rivalPass: '+{n} pts para passares {who}', rivalPassSub: 'Conclui o nível {l} para ultrapassar', rivalTie: 'Empatado com {who}', rivalTieSub: 'Mesmo nível, mesmos pontos. Não abrandes.', rivalTop: 'Estás em 1.º', rivalTopSub: 'Ninguém está à tua frente',
+    status: { done: 'Concluído', available: 'Jogar', locked: 'Bloqueado' },
+    back: '← Mapa', prev: 'Voltar', practice: 'Na prática', step: 'Passo {a} de {b}', next: 'Seguinte', toQuiz: 'Começar o quiz',
+    quiz: 'Pergunta {a} de {b}', right: ['Boa!', 'Certo!', 'Exactamente.'], wrong: 'Ainda não.', wrongSub: 'Perdeste uma vida. Relê e tenta outra vez.',
+    timeout: 'Acabou o tempo!', timeoutSub: 'Perdeste uma vida. Sê mais rápido desta vez.', fast: ' Rapidíssimo.',
+    cont: 'Continuar', unlock: 'Desbloquear tarefa', retry: 'Tentar de novo', combo: 'combo {n}x',
+    noLivesTitle: 'Sem vidas', noLivesSub: 'Revê a lição. As vidas recarregam quando recomeças.', reviewBtn: 'Rever a lição',
+    taskKicker: 'Tarefa on-chain', alreadyDone: 'Já concluíste este nível on-chain. Cada nível só pode ser concluído uma vez.',
+    balanceLbl: 'Saldo na Devnet', needSol: 'Precisas de SOL de teste para pagar o rent da conta.', askSol: 'Pedir 2 SOL', openFaucet: 'Abrir faucet ↗',
+    recipientLbl: 'Endereço do destinatário', recipientPh: 'Cola um endereço Solana', useExample: 'Usar exemplo',
+    rHint: 'Endereço Solana em base58', rSelf: 'O destinatário não pode ser a tua própria carteira.', rBad: 'Endereço inválido.', rOk: 'Endereço válido',
+    sendPre: 'Vais enviar', amount: '0,01 SOL', sendTo: 'para', lamportsNote: '= 10 000 000 lamports + taxa de 5 000',
+    noteLbl: 'A tua nota on-chain', notePh: 'Escreve uma mensagem para ficar na blockchain',
+    tx: ['Assinar na carteira', 'A confirmar na Devnet', 'Confirmado'], signing: 'A aguardar assinatura…', confirming: 'A confirmar…',
+    cancelled: 'Transacção cancelada.', errs: ['O nível anterior ainda não foi concluído.', 'O destinatário não pode ser a tua própria carteira.', 'A mensagem tem de ter entre 1 e 100 caracteres.'],
+    errPoints: 'Não tens pontos suficientes.', errNotOwned: 'Ainda não tens este item.',
+    doneTag: 'Nível {n} concluído', pointsEarned: 'pontos ganhos', bestCombo: 'Melhor combo', heartsLeft: 'Vidas restantes',
+    proof: 'Prova on-chain', viewExplorer: 'Ver no Solana Explorer ↗', nextLevel: 'Começar o nível {n}', toShop: 'Ir à loja',
+    shopKicker: 'Loja', shopHavePre: 'Tens', shopHavePost: 'pontos', shopSub: 'Podes ganhar 450 no total. Os itens custam 700. Escolhe bem.',
+    cat: ['Moldura', 'Acessório', 'Título'], owned: 'Comprado', needLvl: 'Requer nível {n}', needPts: 'Faltam {n} pts', buy: 'Comprar · {n}', needProfile: 'Conclui o nível 1', buying: 'A assinar…',
+    bought: '{x} comprado · −{n} pts', equipped: '{x} equipado', unequipped: '{x} desequipado', equippedTag: ' · equipado', equip: 'Equipar', unequip: 'Desequipar',
+    noProfileTitle: 'Ainda não tens perfil', noProfileSub: 'O teu perfil é criado on-chain quando concluis o nível 1.', startL1: 'Começar o nível 1',
+    level: 'Nível', points: 'Pontos', totalEarned: 'Total ganho', inventory: 'Inventário', noItems: 'Ainda não tens itens.', goShop: 'Ir à loja', noteTitle: 'Nota on-chain',
+    soundLbl: 'Som e vibração', on: 'LIG', off: 'DESL',
+    boardKicker: 'Ranking', boardTitle: 'Top jogadores', boardSub: 'Lido directamente dos perfis on-chain. Nível primeiro, depois total ganho.', you: 'Tu', lv: 'Nv {n}',
+    tabs: ['Aprender', 'Loja', 'Perfil', 'Ranking'], waitSig: 'A aguardar assinatura na carteira…', waitConf: 'A confirmar na Devnet…'
+  }
+};
+const LESSONS = [
+  { level: 1, points: 100,
+    en: { title: 'Wallet', topics: 'Wallets, keys, SOL and Devnet',
+      steps: [
+        { title: 'What is a wallet?', body: "A wallet doesn't hold coins. It holds the keys that prove an account on the blockchain is yours." },
+        { title: 'Public and private keys', body: 'Your public key is your address: share it with anyone. Your private key signs your actions. Whoever has it controls the account.', term: 'Address: 9fRvT3kLmW2pQx8s…7hPq' },
+        { title: 'Test SOL on Devnet', body: "Devnet is Solana's test network. SOL here has no real value, and you can get it for free from the faucet." },
+        { title: 'Why do you need SOL?', body: 'Creating an account takes up space on the blockchain, and that space is paid for in SOL. So creating your profile proves you have SOL and know how to sign.' }
+      ],
+      quiz: [
+        { q: 'Which one should you never share?', o: ['Public key', 'Private key', 'Address'], a: 1, e: 'Your private key signs for you. Whoever has it can move everything you own.' },
+        { q: 'Does Devnet SOL have real value?', o: ['Yes, same as mainnet', 'No, it is for testing only'], a: 1, e: "It's a test network: SOL is free and meant for experimenting." }
+      ],
+      task: { title: 'Create your on-chain profile', body: 'This creates your player account. It stores your level, points and items, and pays a small rent in SOL.', btn: 'Create profile' } },
+    pt: { title: 'Carteira', topics: 'Carteiras, chaves, SOL e Devnet',
+      steps: [
+        { title: 'O que é uma carteira?', body: 'Uma carteira não guarda moedas. Guarda as chaves que provam que uma conta na blockchain é tua.' },
+        { title: 'Chave pública e chave privada', body: 'A chave pública é o teu endereço: podes partilhá-la com qualquer pessoa. A chave privada assina as tuas acções. Quem a tiver controla a conta.', term: 'Endereço: 9fRvT3kLmW2pQx8s…7hPq' },
+        { title: 'SOL de teste na Devnet', body: 'A Devnet é a rede de testes da Solana. O SOL aqui não tem valor real e podes pedi-lo de graça no faucet.' },
+        { title: 'Porque precisas de SOL?', body: 'Criar uma conta ocupa espaço na blockchain, e esse espaço paga-se em SOL. Por isso, criar o teu perfil prova que já tens SOL e sabes assinar.' }
+      ],
+      quiz: [
+        { q: 'Qual destas nunca deves partilhar?', o: ['Chave pública', 'Chave privada', 'Endereço'], a: 1, e: 'A chave privada assina por ti. Quem a tiver pode mover tudo o que é teu.' },
+        { q: 'O SOL da Devnet tem valor real?', o: ['Sim, igual ao da mainnet', 'Não, é só para testes'], a: 1, e: 'É uma rede de testes: o SOL é gratuito e serve para experimentar.' }
+      ],
+      task: { title: 'Cria o teu perfil on-chain', body: 'Vais criar a tua conta de jogador. Ela guarda o teu nível, pontos e itens, e paga um pequeno rent em SOL.', btn: 'Criar perfil' } } },
+  { level: 2, points: 150,
+    en: { title: 'Transactions', topics: 'Signatures, fees, lamports and Explorer',
+      steps: [
+        { title: 'What is a transaction?', body: 'A signed request to change the state of the blockchain: move SOL, create an account or call a program.' },
+        { title: 'Signatures', body: 'Your wallet signs with your private key. The network checks the signature matches your address without ever seeing the key.' },
+        { title: 'Fees and lamports', body: 'Every transaction pays a small fee. A lamport is the smallest unit of SOL.', term: '1 SOL = 1,000,000,000 lamports\nbase fee = 5,000 lamports' },
+        { title: 'The Explorer', body: 'Every transaction has a unique signature. On Solana Explorer, anyone can see what happened.' }
+      ],
+      quiz: [
+        { q: 'How many lamports are in 1 SOL?', o: ['1,000', '1,000,000', '1,000,000,000'], a: 2, e: 'One billion. That is why fees look like big numbers in lamports.' },
+        { q: 'Who signs your transactions?', o: ['Your wallet', 'SkillChain', 'A validator'], a: 0, e: 'Only your wallet holds the private key. No app signs for you.' }
+      ],
+      task: { title: 'Send 0.01 SOL', body: 'The transfer is made by the program instruction that completes the level. Pick an address that is not yours.', btn: 'Send 0.01 SOL' } },
+    pt: { title: 'Transacções', topics: 'Assinaturas, taxas, lamports e Explorer',
+      steps: [
+        { title: 'O que é uma transacção?', body: 'É um pedido assinado para alterar o estado da blockchain: mover SOL, criar uma conta ou chamar um programa.' },
+        { title: 'Assinatura', body: 'A carteira assina com a tua chave privada. A rede confirma que a assinatura corresponde ao teu endereço sem nunca ver a chave.' },
+        { title: 'Taxas e lamports', body: 'Cada transacção paga uma pequena taxa. O lamport é a unidade mais pequena de SOL.', term: '1 SOL = 1 000 000 000 lamports\ntaxa base = 5 000 lamports' },
+        { title: 'O Explorer', body: 'Cada transacção tem uma assinatura única. No Solana Explorer, qualquer pessoa pode ver o que aconteceu.' }
+      ],
+      quiz: [
+        { q: 'Quantos lamports tem 1 SOL?', o: ['1 000', '1 000 000', '1 000 000 000'], a: 2, e: 'Mil milhões. É por isso que as taxas parecem números grandes em lamports.' },
+        { q: 'Quem assina as tuas transacções?', o: ['A tua carteira', 'O SkillChain', 'Um validador'], a: 0, e: 'Só a tua carteira tem a chave privada. Nenhuma app assina por ti.' }
+      ],
+      task: { title: 'Envia 0,01 SOL', body: 'A transferência é feita pela instrução do programa que conclui o nível. Escolhe um endereço que não seja o teu.', btn: 'Enviar 0,01 SOL' } } },
+  { level: 3, points: 200,
+    en: { title: 'Accounts', topics: 'Accounts, rent, programs and PDAs',
+      steps: [
+        { title: 'Everything is an account', body: 'On Solana, data lives in accounts. Your balance, your profile and programs themselves are all accounts.' },
+        { title: 'Programs', body: "A program is code deployed on the blockchain. It doesn't store data itself: it reads and writes other accounts." },
+        { title: 'Rent', body: 'Every account must hold enough SOL for the space it uses. Closing the account gives that SOL back.' },
+        { title: 'PDAs', body: 'A PDA is an address derived from a program and some seeds. It has no private key: only the program can sign for it.', term: 'seeds = ["profile", your_wallet]' }
+      ],
+      quiz: [
+        { q: 'Who can sign for a PDA?', o: ['The wallet owner', 'The program that derived it', 'Any validator'], a: 1, e: 'A PDA has no private key. Only its program can sign for it.' },
+        { q: 'What does rent pay for?', o: ['The space the account uses', 'Every click in the app', 'The account name'], a: 0, e: 'The more data an account stores, the more SOL it must hold.' }
+      ],
+      task: { title: 'Create an on-chain note', body: 'Your note will live in a PDA derived from your wallet. Write anything, up to 100 characters.', btn: 'Create note' } },
+    pt: { title: 'Contas', topics: 'Contas, rent, programas e PDAs',
+      steps: [
+        { title: 'Tudo é uma conta', body: 'Na Solana, os dados vivem em contas. O teu saldo, o teu perfil e os próprios programas são contas.' },
+        { title: 'Programas', body: 'Um programa é código publicado na blockchain. Não guarda dados em si: lê e escreve noutras contas.' },
+        { title: 'Rent', body: 'Cada conta tem de manter SOL suficiente para o espaço que ocupa. Fechar a conta devolve esse SOL.' },
+        { title: 'PDAs', body: 'Uma PDA é um endereço derivado do programa e de sementes. Não tem chave privada: só o programa a pode assinar.', term: 'seeds = ["profile", a_tua_carteira]' }
+      ],
+      quiz: [
+        { q: 'Quem pode assinar por uma PDA?', o: ['O dono da carteira', 'O programa que a derivou', 'Qualquer validador'], a: 1, e: 'A PDA não tem chave privada. Só o programa consegue assinar por ela.' },
+        { q: 'O que paga o rent?', o: ['O espaço que a conta ocupa', 'Cada clique na app', 'O nome da conta'], a: 0, e: 'Quanto mais dados a conta guarda, mais SOL tem de manter.' }
+      ],
+      task: { title: 'Cria uma nota on-chain', body: 'A nota vai viver numa PDA derivada da tua carteira. Escreve o que quiseres, até 100 caracteres.', btn: 'Criar nota' } } }
+];
+const ITEMS = [
+  { id: 0, cat: 0, en: 'Devnet Frame', pt: 'Moldura Devnet', price: 100, lvl: 1 },
+  { id: 1, cat: 0, en: 'Validator Frame', pt: 'Moldura Validador', price: 250, lvl: 3 },
+  { id: 2, cat: 1, en: 'Turbo Goggles', pt: 'Óculos Turbo', price: 150, lvl: 2 },
+  { id: 3, cat: 2, en: 'PDA Master', pt: 'Mestre das PDAs', price: 200, lvl: 3 }
+];
+const SLOT = ['frame', 'acc', 'title'];
+const ME = '9fRvT3kLmW2pQx8sYbN4cJdHz6aE1uGoV5iKtXrB7hPq';
+const EXAMPLE = 'Gx4mN8qPzR2vTk7LbW1sYcH5dJ9eFaU3oQ6iXtB2nKpM';
+const B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const short = a => a.slice(0, 4) + '…' + a.slice(-4);
+const hueOf = s => { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
+const randSig = () => Array.from({ length: 88 }, () => B58[Math.floor(Math.random() * 58)]).join('');
+const fmt = (str, o) => str.replace(/\{(\w+)\}/g, (_, k) => o[k] ?? '');
+const PLAYERS = [
+  ['4hTqYw8LcR3nPz6mKxD2sVbF9aJeGu1oN7iWtQ5rH2Zk', 3, 450, 1, true, 3],
+  ['Bm7xR2kPqN9vTz4LcW8sYdH3eJ6fAu1oG5iKtX2nQpLs', 3, 450, 0, false, 3],
+  ['7nKpX3qRmT8vLz2WcB6sYdH9eJ4fAu1oG5iNtQ7rPxMa', 3, 450, 255, true, 255],
+  ['DqW5mN2xR8kPvT3LzC7sYbH6eJ9fAu4oG1iKtX5nQrVy', 2, 250, 0, false, 255],
+  ['Hs3LpQ9xR2kNvT7mZc4WyB8dJ6eFaU1oG5iKtX3nQrPw', 2, 250, 255, true, 255],
+  ['Kc8vT2mR5xNqP9LzW3sYbH7eJ4fAu6oG1iDtX8nQpRm', 1, 100, 0, false, 255],
+  ['Pw2nX7qRmK4vTz9LcB3sYdH8eJ5fAu1oG6iWtQ2rHxNb', 1, 100, 255, false, 255]
+].map(([addr, level, total, frame, acc, title]) => ({ addr, level, total, frame, acc, title }));
+const PRESETS = {
+  0: null,
+  1: { level: 1, points: 100, total: 100, items: 0, frame: 255, acc: 255, title: 255 },
+  2: { level: 2, points: 250, total: 250, items: 0, frame: 255, acc: 255, title: 255 },
+  3: { level: 3, points: 150, total: 450, items: 0b1001, frame: 0, acc: 255, title: 3 }
+};
+const C = { ink: '#0E0F14', s1: '#171922', s2: '#20232F', line: '#2A2E3B', text: '#F2F1EC', muted: '#9A9CA8', dim: '#5A5D6A', lime: '#14F195', limeD: '#0B9A5E', violet: '#A15CFF', red: '#FF6B5E', redD: '#B5443A' };
+
+class Component extends DCLogic {
+  state = this.initial();
+
+  initial() {
+    const props = this.props || {};
+    const s = Number(props.startLevel ?? 0);
+    const p = PRESETS[s];
+    return {
+      lang: props.lang ?? 'en', sound: props.sound ?? true,
+      connected: s > 0, screen: s > 0 ? 'learn' : 'landing',
+      profile: p ? { ...p } : null,
+      note: s === 3 ? 'gm Devnet!' : null,
+      balance: props.noSol && s === 0 ? 0 : 1.98,
+      lvl: 1, stage: 'steps', step: 0, q: 0, picked: null, qStart: 0, now: 0, answerMs: 0,
+      lives: 3, combo: 0, lessonBest: 0, comboTick: 0, shakeTick: 0,
+      mQuiz: 0, mCombo: 0, mFast: 0,
+      tx: 'idle', txCtx: null, sig: null, err: null, toastOk: '',
+      recipient: '', message: '', gain: 0, busyItem: null
+    };
+  }
+
+  componentDidMount() {
+    this.tick = setInterval(() => {
+      const s = this.state;
+      if (s.screen !== 'lesson' || s.stage !== 'quiz' || s.picked !== null) return;
+      if (Date.now() - s.qStart >= QTIME) this.answer(-1);
+      else this.setState({ now: Date.now() });
+    }, 100);
+  }
+  componentDidUpdate(prev) {
+    if (prev.startLevel !== this.props.startLevel || prev.noSol !== this.props.noSol) { this.clear(); this.setState(this.initial()); }
+    if (prev.lang !== this.props.lang && this.props.lang) this.setState({ lang: this.props.lang });
+    if (prev.sound !== this.props.sound && this.props.sound !== undefined) this.setState({ sound: this.props.sound });
+  }
+  componentWillUnmount() { this.clear(); clearInterval(this.tick); }
+  clear() { clearTimeout(this.t1); clearTimeout(this.t2); clearTimeout(this.t3); }
+
+  sfx(kind) {
+    if (!this.state.sound) return;
+    const vib = { ok: 25, bad: [60, 40, 60], level: [40, 30, 40, 30, 120], coin: 30, tap: 10 }[kind];
+    try { navigator.vibrate && navigator.vibrate(vib); } catch (e) {}
+    try {
+      const ctx = this.actx || (this.actx = new (window.AudioContext || window.webkitAudioContext)());
+      const seq = { ok: [[660, 0, .09], [990, .08, .14]], bad: [[180, 0, .22, 'sawtooth']], level: [[523, 0, .12], [659, .11, .12], [784, .22, .12], [1047, .33, .3]], coin: [[1318, 0, .06], [1760, .06, .14]], tap: [[440, 0, .04]] }[kind];
+      const t0 = ctx.currentTime;
+      seq.forEach(([f, at, d, type]) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = type || 'square'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t0 + at);
+        g.gain.exponentialRampToValueAtTime(0.08, t0 + at + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + d);
+        o.connect(g).connect(ctx.destination); o.start(t0 + at); o.stop(t0 + at + d + 0.02);
+      });
+    } catch (e) {}
+  }
+
+  busy() { return this.state.tx === 'signing' || this.state.tx === 'confirming'; }
+  T() { return L10N[this.state.lang] || L10N.en; }
+
+  runTx(ctx, errMsg, onOk, okText, okSfx) {
+    if (this.busy()) return;
+    this.clear();
+    this.setState({ tx: 'signing', txCtx: ctx, err: null, sig: null });
+    this.t1 = setTimeout(() => {
+      const out = this.props.txOutcome ?? 'success';
+      if (out === 'cancelled') { this.sfx('bad'); this.setState({ tx: 'error', err: this.T().cancelled, busyItem: null }); this.autoHide(ctx); return; }
+      this.setState({ tx: 'confirming' });
+      this.t2 = setTimeout(() => {
+        if (out === 'error') { this.sfx('bad'); this.setState({ tx: 'error', err: errMsg, busyItem: null }); this.autoHide(ctx); return; }
+        this.sfx(okSfx || 'coin');
+        this.setState({ tx: 'confirmed', sig: randSig(), toastOk: okText || '', busyItem: null });
+        onOk();
+        this.autoHide(ctx);
+      }, 1300);
+    }, 1100);
+  }
+  autoHide(ctx) { if (ctx !== 'lesson') this.t3 = setTimeout(() => this.setState({ tx: 'idle', txCtx: null }), 3200); }
+
+  openLesson(n) {
+    const lv = this.state.profile ? this.state.profile.level : 0;
+    if (n > lv + 1) return;
+    this.sfx('tap');
+    this.setState({ screen: 'lesson', lvl: n, stage: 'steps', step: 0, q: 0, picked: null, lives: 3, lessonBest: 0, tx: 'idle', txCtx: null, recipient: '', message: '' });
+  }
+
+  answer(i) {
+    const s = this.state;
+    if (s.picked !== null) return;
+    const Q = LESSONS[s.lvl - 1][s.lang].quiz[s.q];
+    const ms = Date.now() - s.qStart;
+    if (i === Q.a) {
+      this.sfx('ok');
+      const combo = s.combo + 1;
+      this.setState({ picked: i, answerMs: ms, combo, lessonBest: Math.max(s.lessonBest, combo), mCombo: Math.max(s.mCombo, combo), mFast: s.mFast + (ms < 5000 ? 1 : 0), comboTick: s.comboTick + 1 });
+    } else {
+      this.sfx('bad');
+      this.setState({ picked: i, answerMs: ms, combo: 0, lives: Math.max(0, s.lives - 1), shakeTick: s.shakeTick + 1 });
+    }
+  }
+
+  completeLevel() {
+    const n = this.state.lvl, L = LESSONS[n - 1];
+    this.runTx('lesson', this.T().errs[n - 1], () => {
+      this.setState(s => {
+        const p = s.profile ? { ...s.profile } : { ...PRESETS[1], points: 0, total: 0, level: 0 };
+        p.level = n; p.points += L.points; p.total += L.points;
+        return { profile: p, gain: L.points, balance: Math.max(0, s.balance - (n === 2 ? 0.010005 : 0.0019)), note: n === 3 ? s.message.trim() : s.note };
+      });
+      setTimeout(() => this.setState({ stage: 'done', tx: 'idle' }), 700);
+    }, '', 'level');
+  }
+
+  renderVals() {
+    const s = this.state, t = this.T(), lang = s.lang in L10N ? s.lang : 'en';
+    const p = s.profile, lv = p ? p.level : 0, busy = this.busy();
+    const go = k => () => { if (busy) return; this.setState({ screen: k, tx: 'idle', txCtx: null }); };
+    const L = LESSONS[s.lvl - 1][lang], LP = LESSONS[s.lvl - 1].points;
+    const itemName = it => it[lang];
+    const explorerUrl = s.sig ? `https://explorer.solana.com/tx/${s.sig}?cluster=devnet` : 'https://explorer.solana.com/?cluster=devnet';
+
+    const tabs = ['learn', 'shop', 'profile', 'leaderboard'].map((k, i) => {
+      const a = s.screen === k || (k === 'learn' && s.screen === 'lesson');
+      return { label: t.tabs[i], go: go(k), color: a ? C.lime : C.muted, bar: a ? C.lime : 'transparent' };
+    });
+
+    const levelCards = LESSONS.map(l => {
+      const st = lv >= l.level ? 'done' : lv === l.level - 1 ? 'available' : 'locked';
+      return {
+        n: l.level, title: l[lang].title, topics: l[lang].topics, points: `+${l.points}`, statusLabel: t.status[st],
+        open: () => this.openLesson(l.level),
+        cardBorder: st === 'available' ? C.lime : C.line, shadow: st === 'available' ? C.limeD : '#0A0B0F',
+        numBg: st === 'available' ? C.lime : st === 'done' ? C.s2 : C.ink, numColor: st === 'available' ? C.ink : st === 'done' ? C.lime : C.dim,
+        titleColor: st === 'locked' ? C.muted : C.text, ptsColor: st === 'locked' ? C.dim : C.lime,
+        chipBg: st === 'available' ? C.lime : st === 'done' ? C.s2 : 'transparent', chipColor: st === 'available' ? C.ink : C.muted,
+        cursor: st === 'locked' ? 'not-allowed' : 'pointer', notLast: l.level < 3, lineColor: lv >= l.level ? C.lime : C.line
+      };
+    });
+
+    // missions
+    const mdefs = [[t.m1, s.mQuiz, 1], [t.m2, s.mCombo, 5], [t.m3, s.mFast, 3]];
+    const missions = mdefs.map(([label, v, goal]) => {
+      const d = Math.min(v, goal), ok = d >= goal;
+      return { label, count: `${d}/${goal}`, pct: `${(d / goal) * 100}%`, check: ok ? '✓' : '', checkBg: ok ? C.lime : 'transparent', checkBorder: ok ? C.lime : C.line, color: ok ? C.muted : C.text };
+    });
+    const now = new Date(), mid = new Date(now); mid.setHours(24, 0, 0, 0);
+    const left = mid - now;
+
+    // next reward
+    let reward = { text: t.rewardAll, count: '', pct: '100%' };
+    if (p) {
+      const un = ITEMS.filter(it => !((p.items >> it.id) & 1)).sort((a, b) => a.price - b.price);
+      const buyable = un.find(it => lv >= it.lvl && p.points >= it.price);
+      const tgt = buyable || un.find(it => lv >= it.lvl) || un[0];
+      if (tgt) {
+        const pct = Math.min(100, (p.points / tgt.price) * 100);
+        reward = {
+          text: buyable ? fmt(t.rewardBuy, { x: itemName(buyable) }) : lv < tgt.lvl ? fmt(t.rewardLevel, { x: itemName(tgt), n: tgt.lvl }) : fmt(t.rewardNeed, { n: tgt.price - p.points, x: itemName(tgt) }),
+          count: `${Math.min(p.points, tgt.price)}/${tgt.price}`, pct: `${pct}%`
+        };
+      }
+    }
+
+    // board + rival
+    const rows = PLAYERS.map(x => ({ ...x, me: false }));
+    if (p) rows.push({ addr: ME, level: p.level, total: p.total, frame: p.frame, acc: p.acc === 2, title: p.title, me: true });
+    rows.sort((a, b) => b.level - a.level || b.total - a.total || (a.me ? 1 : -1));
+    const myIdx = rows.findIndex(r => r.me);
+    let rival = null;
+    if (myIdx >= 0) {
+      if (myIdx === 0) rival = { text: t.rivalTop, sub: t.rivalTopSub, hue: hueOf(ME), frame: p.frame, acc: p.acc === 2 };
+      else {
+        const a = rows[myIdx - 1], who = short(a.addr);
+        rival = a.level > lv && lv < 3
+          ? { text: fmt(t.rivalPass, { n: LESSONS[lv].points, who }), sub: fmt(t.rivalPassSub, { l: lv + 1 }), hue: hueOf(a.addr), frame: a.frame, acc: a.acc }
+          : { text: fmt(t.rivalTie, { who }), sub: t.rivalTieSub, hue: hueOf(a.addr), frame: a.frame, acc: a.acc };
+      }
+    }
+    const board = rows.map((x, i) => ({
+      pos: i + 1, addr: short(x.addr), levelLabel: fmt(t.lv, { n: x.level }), total: x.total,
+      hue: hueOf(x.addr), frame: x.frame, acc: x.acc,
+      sub: x.me ? t.you : x.title === 3 ? itemName(ITEMS[3]) : '—',
+      bg: x.me ? 'rgba(20,241,149,.07)' : C.s1, border: x.me ? C.lime : C.line, posColor: i < 3 ? C.lime : C.muted
+    }));
+
+    // lesson
+    const nSteps = L.steps.length;
+    const cur = s.stage === 'steps' ? s.step : s.stage === 'quiz' || s.stage === 'nolives' ? nSteps : nSteps + 1;
+    const segments = Array.from({ length: nSteps + 2 }, (_, i) => ({ color: i < cur ? C.lime : i === cur ? C.violet : C.line }));
+    const step = L.steps[s.step] || L.steps[0];
+    const Q = L.quiz[s.q] || L.quiz[0];
+    const correct = s.picked !== null && s.picked === Q.a;
+    const timedOut = s.picked === -1;
+    const quizOptions = Q.o.map((text, i) => {
+      let bg = C.s1, border = C.line, keyBg = C.s2, keyColor = C.muted, shadow = '#0A0B0F';
+      if (s.picked === i && correct) { bg = 'rgba(20,241,149,.10)'; border = C.lime; keyBg = C.lime; keyColor = C.ink; shadow = C.limeD; }
+      else if (s.picked === i) { bg = 'rgba(255,107,94,.10)'; border = C.red; keyBg = C.red; keyColor = C.ink; shadow = C.redD; }
+      return { text, key: 'ABC'[i], bg, border, keyBg, keyColor, shadow, pick: () => this.answer(i) };
+    });
+    const lastQ = s.q === L.quiz.length - 1;
+    const elapsed = s.picked !== null ? s.answerMs : Math.max(0, (s.now || s.qStart) - s.qStart);
+    const remain = Math.max(0, QTIME - elapsed);
+    const hearts = [0, 1, 2].map(i => ({ fill: i < s.lives ? C.red : C.line }));
+
+    // task
+    const already = lv >= s.lvl;
+    const r = s.recipient.trim();
+    const rFormat = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(r);
+    const rSelf = r === ME;
+    const recipientValid = rFormat && !rSelf;
+    const msgLen = s.message.trim().length;
+    let taskReady = !already && !busy;
+    if (s.lvl === 1) taskReady = taskReady && s.balance > 0;
+    if (s.lvl === 2) taskReady = taskReady && recipientValid;
+    if (s.lvl === 3) taskReady = taskReady && msgLen >= 1 && s.message.length <= 100;
+    const txStage = { signing: 0, confirming: 1, confirmed: 2, error: -1 }[s.tx];
+    const txRows = t.tx.map((label, i) => {
+      const done = txStage > i || (txStage === 2 && i === 2), active = txStage === i && i < 2;
+      return { label, dot: done ? C.lime : active ? C.violet : C.line, color: done || active ? C.text : C.muted, anim: active ? 'scpulse 1s ease-in-out infinite' : 'none' };
+    });
+
+    // shop
+    const shopItems = ITEMS.map(it => {
+      const owned = p && ((p.items >> it.id) & 1);
+      const st = !p ? 'noprofile' : owned ? 'owned' : lv < it.lvl ? 'level' : p.points < it.price ? 'points' : 'available';
+      const can = st === 'available' && !busy;
+      const isBusy = s.busyItem === it.id && busy;
+      return {
+        name: itemName(it), meta: `${t.cat[it.cat]} · ${fmt(t.lv, { n: it.lvl })}`,
+        isTitle: it.cat === 2, notTitle: it.cat !== 2, pFrame: it.cat === 0 ? it.id : 255, pAcc: it.id === 2,
+        border: owned ? C.lime : st === 'available' ? C.violet : C.line,
+        pct: `${owned ? 100 : p ? Math.min(100, (p.points / it.price) * 100) : 0}%`, barColor: owned || st === 'available' ? C.lime : C.violet,
+        label: isBusy ? t.buying : { noprofile: t.needProfile, owned: t.owned, level: fmt(t.needLvl, { n: it.lvl }), points: p ? fmt(t.needPts, { n: it.price - p.points }) : '', available: fmt(t.buy, { n: it.price }) }[st],
+        btnBg: st === 'available' ? C.lime : C.s2, btnColor: st === 'available' ? C.ink : owned ? C.lime : C.muted, btnShadow: st === 'available' ? C.limeD : '#0A0B0F',
+        cursor: can ? 'pointer' : 'default',
+        buy: () => {
+          if (!can) return;
+          this.setState({ busyItem: it.id });
+          this.runTx('shop', t.errPoints, () => this.setState(z => ({ profile: { ...z.profile, points: z.profile.points - it.price, items: z.profile.items | (1 << it.id) } })), fmt(t.bought, { x: itemName(it), n: it.price }), 'coin');
+        }
+      };
+    });
+
+    const inventory = p ? ITEMS.filter(it => (p.items >> it.id) & 1).map(it => {
+      const eq = p[SLOT[it.cat]] === it.id;
+      return {
+        name: itemName(it), cat: t.cat[it.cat] + (eq ? t.equippedTag : ''),
+        border: eq ? C.lime : C.line, label: eq ? t.unequip : t.equip,
+        btnBg: eq ? 'transparent' : C.lime, btnColor: eq ? C.text : C.ink, btnBorder: eq ? C.line : C.lime,
+        toggle: () => this.runTx('profile', t.errNotOwned, () => this.setState(z => ({ profile: { ...z.profile, [SLOT[it.cat]]: eq ? 255 : it.id } })), fmt(eq ? t.unequipped : t.equipped, { x: itemName(it) }), 'tap')
+      };
+    }) : [];
+
+    const toastErr = s.tx === 'error';
+    const rightWord = t.right[s.q % t.right.length];
+    return {
+      t, langLabel: lang === 'en' ? 'PT' : 'EN',
+      toggleLang: () => this.setState({ lang: lang === 'en' ? 'pt' : 'en' }),
+      loop: t.loop.map(([title, sub], i) => ({ n: `0${i + 1}`, title, sub })),
+      connected: s.connected, isLanding: s.screen === 'landing', isLearn: s.screen === 'learn', isLesson: s.screen === 'lesson',
+      isShop: s.screen === 'shop', isProfile: s.screen === 'profile', isBoard: s.screen === 'leaderboard',
+      showNav: s.screen !== 'lesson',
+      connect: () => { this.sfx('tap'); this.setState({ connected: true, screen: 'learn' }); },
+      goProfile: go('profile'), goShop: go('shop'), goLearn: go('learn'), tabs,
+      pointsLabel: `${p ? p.points : 0} pts`, pointsNum: p ? p.points : 0, totalNum: p ? p.total : 0, levelNum: lv,
+      myShort: short(ME), myHue: hueOf(ME), myFrame: p ? p.frame : 255, myAcc: !!p && p.acc === 2,
+      hasTitle: !!p && p.title !== 255, titleText: itemName(ITEMS[3]),
+      progressLabel: fmt(t.progress, { a: lv, b: p ? p.total : 0 }),
+      levelCards, showMissions: this.props.missions ?? true, missions, perfectDay: missions.every(m => m.check),
+      resetLabel: fmt(t.resets, { h: Math.floor(left / 3600000), m: Math.floor((left % 3600000) / 60000) }),
+      reward, rival: rival || { text: '', sub: '', hue: 0, frame: 255, acc: false }, showRival: !!rival,
+      rivalAction: () => lv < 3 ? this.openLesson(lv + 1) : this.setState({ screen: 'leaderboard' }),
+
+      lessonTag: `${fmt(t.lv, { n: s.lvl })} · ${L.title}`, segments, hearts,
+      showCombo: s.combo >= 2, comboLabel: fmt(t.combo, { n: s.combo }), comboAnim: `${s.comboTick % 2 ? 'scpopA' : 'scpopB'} .4s ease`,
+      shakeAnim: s.shakeTick ? `${s.shakeTick % 2 ? 'scshakeA' : 'scshakeB'} .4s ease` : 'none',
+      stageSteps: s.stage === 'steps', stageQuiz: s.stage === 'quiz', stageTask: s.stage === 'task', stageDone: s.stage === 'done', stageNoLives: s.stage === 'nolives',
+      stepCounter: fmt(t.step, { a: s.step + 1, b: nSteps }), stepTitle: step.title, stepBody: step.body,
+      stepHasTerm: !!step.term, stepTerm: step.term || '',
+      canBack: s.step > 0, prevStep: () => this.setState({ step: s.step - 1 }),
+      nextLabel: s.step === nSteps - 1 ? t.toQuiz : t.next,
+      nextStep: () => { this.sfx('tap'); s.step === nSteps - 1 ? this.setState({ stage: 'quiz', q: 0, picked: null, qStart: Date.now(), now: Date.now() }) : this.setState({ step: s.step + 1 }); },
+
+      quizCounter: fmt(t.quiz, { a: s.q + 1, b: L.quiz.length }), quizQuestion: Q.q, quizOptions,
+      timerLabel: `${Math.ceil(remain / 1000)}s`, timerPct: `${(remain / QTIME) * 100}%`, timerColor: remain < 5000 ? C.red : C.lime,
+      hasPicked: s.picked !== null,
+      feedbackBg: correct ? '#0D2219' : '#2A1514', feedbackColor: correct ? C.lime : C.red, feedbackShadow: correct ? C.limeD : C.redD,
+      feedbackTitle: correct ? rightWord : timedOut ? t.timeout : t.wrong,
+      feedbackBody: correct ? Q.e + (s.answerMs < 5000 ? t.fast : '') : timedOut ? t.timeoutSub : t.wrongSub,
+      quizBtnLabel: correct ? (lastQ ? t.unlock : t.cont) : t.retry,
+      quizAction: () => {
+        if (s.picked === null) return;
+        if (!correct) return s.lives <= 0 ? this.setState({ stage: 'nolives' }) : this.setState({ picked: null, qStart: Date.now(), now: Date.now() });
+        if (lastQ) this.setState({ stage: 'task', tx: 'idle', txCtx: null, mQuiz: s.mQuiz + 1 });
+        else this.setState({ q: s.q + 1, picked: null, qStart: Date.now(), now: Date.now() });
+      },
+      reviewLesson: () => this.setState({ stage: 'steps', step: 0, q: 0, picked: null, lives: 3 }),
+
+      lessonPoints: `+${LP} pts`, taskTitle: L.task.title, taskBody: L.task.body, alreadyDone: already,
+      showT1: s.lvl === 1 && !already, showT2: s.lvl === 2 && !already, showT3: s.lvl === 3 && !already,
+      balanceLabel: `${lang === 'pt' ? s.balance.toFixed(2).replace('.', ',') : s.balance.toFixed(2)} SOL`, balanceColor: s.balance > 0 ? C.text : '#FF8A7E',
+      noBalance: s.balance <= 0, airdrop: () => { this.sfx('coin'); this.setState({ balance: 2 }); },
+      recipient: s.recipient, onRecipient: e => this.setState({ recipient: e.target.value }), fillExample: () => this.setState({ recipient: EXAMPLE }),
+      recipientValid, recipientShort: rFormat ? short(r) : '',
+      recipientBorder: !r ? C.line : recipientValid ? C.lime : C.red,
+      recipientHint: !r ? t.rHint : rSelf ? t.rSelf : !rFormat ? t.rBad : t.rOk,
+      recipientHintColor: !r ? C.muted : recipientValid ? C.lime : '#FF8A7E',
+      message: s.message, onMessage: e => this.setState({ message: e.target.value.slice(0, 120) }),
+      msgCount: `${s.message.length}/100`, msgCountColor: s.message.length > 100 ? '#FF8A7E' : C.muted,
+      showTx: s.txCtx === 'lesson' && s.tx !== 'idle', txRows, txIsError: toastErr, txError: s.err,
+      showTaskBtn: !already,
+      taskBtnLabel: s.tx === 'signing' ? t.signing : s.tx === 'confirming' ? t.confirming : toastErr ? t.retry : L.task.btn,
+      taskBtnBg: taskReady ? C.lime : C.s2, taskBtnColor: taskReady ? C.ink : C.muted, taskBtnShadow: taskReady ? C.limeD : '#0A0B0F',
+      taskAction: () => { if (taskReady) this.completeLevel(); },
+
+      doneTag: fmt(t.doneTag, { n: s.lvl }), doneGain: `+${s.gain}`, sigShort: s.sig ? short(s.sig) : '',
+      bestComboLabel: `${s.lessonBest}x`, heartsLeftLabel: `${s.lives}/3`,
+      explorerUrl, doneLabel: s.lvl < 3 ? fmt(t.nextLevel, { n: s.lvl + 1 }) : t.toShop,
+      doneAction: () => s.lvl < 3 ? this.openLesson(s.lvl + 1) : this.setState({ screen: 'shop' }),
+
+      shopItems, noProfile: !p, hasProfile: !!p, inventory, noItems: inventory.length === 0,
+      hasNote: !!s.note, noteText: s.note || '', board,
+      toggleSound: () => this.setState({ sound: !s.sound }, () => this.sfx('tap')),
+      soundState: s.sound ? t.on : t.off, soundColor: s.sound ? C.lime : C.muted,
+
+      showToast: !!s.txCtx && s.txCtx !== 'lesson' && s.tx !== 'idle',
+      toastText: s.tx === 'signing' ? t.waitSig : s.tx === 'confirming' ? t.waitConf : toastErr ? s.err : s.toastOk,
+      toastDot: toastErr ? C.red : s.tx === 'confirmed' ? C.lime : C.violet,
+      toastBorder: toastErr ? C.red : s.tx === 'confirmed' ? C.lime : C.line,
+      toastAnim: busy ? 'scpulse 1s ease-in-out infinite' : 'none', toastHasLink: s.tx === 'confirmed'
+    };
+  }
+}
+</script>
+</body>
+</html>
