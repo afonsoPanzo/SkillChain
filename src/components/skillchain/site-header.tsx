@@ -4,6 +4,7 @@ import Link from "next/link";
 import { WalletMultiButton, useWallet } from "@solana/wallet-adapter";
 import { backend } from "@/lib/skillchain/backend";
 import { useProfile } from "@/lib/skillchain/hooks";
+import { ProfileAvatar } from "./avatar";
 
 export function SiteHeader() {
   const { connected } = useWallet();
@@ -40,6 +41,11 @@ export function SiteHeader() {
             <span className="font-mono text-[13px] font-semibold text-lime">
               {profile.points} pts
             </span>
+          )}
+          {profile && (
+            <Link href="/profile" className="block size-[34px]" aria-label="O teu perfil">
+              <ProfileAvatar profile={profile} />
+            </Link>
           )}
           <WalletMultiButton />
         </div>

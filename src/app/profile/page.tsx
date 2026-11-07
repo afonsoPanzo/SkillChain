@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/skillchain/coming-soon";
+import { ProfileScreen } from "@/components/skillchain/profile-screen";
 
 export default function ProfilePage() {
-  return <ComingSoon title="Perfil" phase={3} />;
+  return <ProfileScreen />;
 }

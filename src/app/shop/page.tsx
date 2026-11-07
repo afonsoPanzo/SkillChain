@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/skillchain/coming-soon";
+import { ShopScreen } from "@/components/skillchain/shop-screen";
 
 export default function ShopPage() {
-  return <ComingSoon title="Loja" phase={3} />;
+  return <ShopScreen />;
 }
