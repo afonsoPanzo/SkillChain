@@ -22,6 +22,8 @@ export const PROGRAM_ERRORS = [
   { name: "NotEnoughPoints", message: "Não tens pontos suficientes." },
   { name: "NotOwned", message: "Ainda não tens este item." },
   { name: "Unauthorized", message: "Este perfil não te pertence." },
+  { name: "InvalidSlot", message: "Espaço de equipamento inválido." },
+  { name: "Overflow", message: "Erro de cálculo de pontos." },
 ] as const;
 
 export type ProgramErrorName = (typeof PROGRAM_ERRORS)[number]["name"];
@@ -59,6 +61,28 @@ function messageChain(err: unknown): string {
   return parts.join("\n");
 }
 
+/**
+ * Finds the custom program error code (6000 and up) in an error or its logs:
+ * "custom program error: 0x1771", {"InstructionError":[0,{"Custom":6001}]},
+ * or "Error Number: 6001".
+ */
+export function extractCustomCode(text: string): number | null {
+  const hex = /custom program error: 0x([0-9a-f]+)/i.exec(text);
+  if (hex) return parseInt(hex[1], 16);
+  const json = /"?Custom"?\s*:\s*(\d+)/.exec(text);
+  if (json) return Number(json[1]);
+  const logged = /Error Number:\s*(\d+)/.exec(text);
+  if (logged) return Number(logged[1]);
+  return null;
+}
+
+/** Serialises a transaction error from the RPC (may contain bigint). */
+export function describeTxError(err: unknown): string {
+  return JSON.stringify(err, (_key, value) =>
+    typeof value === "bigint" ? Number(value) : value,
+  );
+}
+
 export function toUserMessage(err: unknown): string {
   const text = messageChain(err);
 
@@ -66,14 +90,14 @@ export function toUserMessage(err: unknown): string {
     return CANCELLED_MESSAGE;
   }
 
-  for (const { name, message } of PROGRAM_ERRORS) {
-    if (new RegExp(`\\b${name}\\b`).test(text)) return message;
+  const code = extractCustomCode(text);
+  if (code !== null) {
+    const entry = PROGRAM_ERRORS[code - ANCHOR_ERROR_OFFSET];
+    if (entry) return entry.message;
   }
 
-  const hex = /custom program error: 0x([0-9a-f]+)/i.exec(text);
-  if (hex) {
-    const entry = PROGRAM_ERRORS[parseInt(hex[1], 16) - ANCHOR_ERROR_OFFSET];
-    if (entry) return entry.message;
+  for (const { name, message } of PROGRAM_ERRORS) {
+    if (new RegExp(`\\b${name}\\b`).test(text)) return message;
   }
 
   if (/already in use/i.test(text)) return "O teu perfil já existe.";

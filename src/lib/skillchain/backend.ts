@@ -1,11 +1,13 @@
 import { mockBackend } from "./mock-backend";
+import { createProgramBackend } from "./program";
 import type { SkillChainBackend } from "./types";
 
-/**
- * The active data layer. Right now it is the in-memory mock.
- *
- * When the IDL (src/idl/skillchain.json) and NEXT_PUBLIC_SKILLCHAIN_PROGRAM_ID
- * are available, implement SkillChainBackend against the program and export it
- * here instead. Hooks and components stay untouched.
- */
-export const backend: SkillChainBackend = mockBackend;
+const PROGRAM_ID = (process.env.NEXT_PUBLIC_SKILLCHAIN_PROGRAM_ID ?? "").trim();
+const FORCE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+
+/** The mock is used if NEXT_PUBLIC_USE_MOCK=true or there is no Program ID. */
+export const USE_MOCK = FORCE_MOCK || PROGRAM_ID === "";
+
+export const backend: SkillChainBackend = USE_MOCK
+  ? mockBackend
+  : createProgramBackend(PROGRAM_ID);

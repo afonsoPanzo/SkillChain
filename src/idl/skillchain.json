@@ -1,0 +1,554 @@
+{
+  "address": "AqdB1HaXB8wnvwGFTNsxTRrpSNMMVs2x5t4bz6UxU2X7",
+  "metadata": {
+    "name": "skillchain",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "SkillChain"
+  },
+  "instructions": [
+    {
+      "name": "buy_item",
+      "discriminator": [
+        80,
+        82,
+        193,
+        201,
+        216,
+        27,
+        70,
+        184
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "signer": true
+        },
+        {
+          "name": "profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "item_id",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "complete_level_2",
+      "discriminator": [
+        95,
+        203,
+        80,
+        22,
+        59,
+        90,
+        204,
+        41
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "recipient",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "complete_level_3",
+      "discriminator": [
+        218,
+        44,
+        155,
+        174,
+        146,
+        231,
+        246,
+        164
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "note",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  110,
+                  111,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "message",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "equip_item",
+      "discriminator": [
+        38,
+        155,
+        16,
+        165,
+        146,
+        31,
+        4,
+        255
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "signer": true
+        },
+        {
+          "name": "profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "item_id",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "init_profile",
+      "discriminator": [
+        210,
+        162,
+        212,
+        95,
+        95,
+        186,
+        89,
+        119
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unequip_item",
+      "discriminator": [
+        96,
+        192,
+        232,
+        54,
+        127,
+        191,
+        236,
+        128
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "signer": true
+        },
+        {
+          "name": "profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "slot",
+          "type": "u8"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Note",
+      "discriminator": [
+        203,
+        75,
+        252,
+        196,
+        81,
+        210,
+        122,
+        126
+      ]
+    },
+    {
+      "name": "Profile",
+      "discriminator": [
+        184,
+        101,
+        165,
+        188,
+        95,
+        63,
+        127,
+        188
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "ItemBought",
+      "discriminator": [
+        164,
+        239,
+        51,
+        167,
+        116,
+        135,
+        31,
+        189
+      ]
+    },
+    {
+      "name": "LevelCompleted",
+      "discriminator": [
+        13,
+        235,
+        21,
+        229,
+        131,
+        175,
+        231,
+        133
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "WrongLevel",
+      "msg": "O nível anterior ainda não foi concluído."
+    },
+    {
+      "code": 6001,
+      "name": "InvalidRecipient",
+      "msg": "O destinatário não pode ser a tua própria carteira."
+    },
+    {
+      "code": 6002,
+      "name": "MessageTooLong",
+      "msg": "A mensagem tem de ter entre 1 e 100 caracteres."
+    },
+    {
+      "code": 6003,
+      "name": "UnknownItem",
+      "msg": "Este item não existe."
+    },
+    {
+      "code": 6004,
+      "name": "AlreadyOwned",
+      "msg": "Já tens este item."
+    },
+    {
+      "code": 6005,
+      "name": "LevelTooLow",
+      "msg": "Precisas de um nível mais alto para este item."
+    },
+    {
+      "code": 6006,
+      "name": "NotEnoughPoints",
+      "msg": "Não tens pontos suficientes."
+    },
+    {
+      "code": 6007,
+      "name": "NotOwned",
+      "msg": "Ainda não tens este item."
+    },
+    {
+      "code": 6008,
+      "name": "Unauthorized",
+      "msg": "Este perfil não te pertence."
+    },
+    {
+      "code": 6009,
+      "name": "InvalidSlot",
+      "msg": "Espaço de equipamento inválido."
+    },
+    {
+      "code": 6010,
+      "name": "Overflow",
+      "msg": "Erro de cálculo de pontos."
+    }
+  ],
+  "types": [
+    {
+      "name": "ItemBought",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "item_id",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LevelCompleted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "points",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Note",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "message",
+            "type": "string"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Profile",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "points",
+            "type": "u64"
+          },
+          {
+            "name": "total_earned",
+            "type": "u64"
+          },
+          {
+            "name": "items",
+            "type": "u8"
+          },
+          {
+            "name": "equipped_frame",
+            "type": "u8"
+          },
+          {
+            "name": "equipped_accessory",
+            "type": "u8"
+          },
+          {
+            "name": "equipped_title",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

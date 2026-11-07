@@ -1,3 +1,5 @@
+import type { Connection, Transaction } from "@solana/web3.js";
+
 export interface Profile {
   /** Wallet address (base58) of the player. */
   owner: string;
@@ -30,6 +32,11 @@ export type TxState =
 export interface TxContext {
   /** Connected wallet address (base58). */
   owner: string;
+  /** Asks the wallet to sign and send; resolves with the signature. Unused by the mock. */
+  sendTransaction: (
+    tx: Transaction,
+    connection: Connection,
+  ) => Promise<string>;
   /** Call once the wallet has signed and the transaction is being confirmed. */
   onConfirming: () => void;
 }

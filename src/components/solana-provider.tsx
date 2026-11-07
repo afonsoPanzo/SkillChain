@@ -8,9 +8,7 @@ import {
   type WalletError,
 } from "@solana/wallet-adapter";
 
-/** SkillChain runs on Devnet only. */
-const DEVNET_RPC =
-  process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.devnet.solana.com";
+import { DEVNET_RPC } from "@/lib/skillchain/rpc";
 
 function onWalletError(error: WalletError) {
   console.error(error);

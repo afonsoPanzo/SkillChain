@@ -52,7 +52,10 @@ Alterações em relação ao template: `app/` passou para `src/app/` e o alias `
 | `constants.ts` | Espelho das constantes da secção 4.4 do SDD: pontos por nível, 0,01 SOL, `NONE = 255`, os 4 itens com preço, nível mínimo e asset |
 | `types.ts` | `Profile`, `Note`, `TxState` e a interface `SkillChainBackend` |
 | `errors.ts` | Mapa dos 9 erros do programa para mensagens em português, mais cancelamento, saldo e expiração |
-| `backend.ts` | Escolhe a implementação activa (hoje, o mock) |
+| `backend.ts` | Escolhe a implementação: mock se `NEXT_PUBLIC_USE_MOCK=true` ou sem Program ID; senão o programa real |
+| `program.ts` | Backend real sobre `@solana/web3.js` v3 (sem Anchor): PDAs, instruções, envio e confirmação |
+| `codec.ts` | Borsh à mão: descodifica Profile (62 bytes) e Note, verifica o discriminator, serializa argumentos |
+| `rpc.ts` | Endpoint Devnet e ligação partilhada |
 | `mock-backend.ts` | Implementação em memória com as mesmas regras do programa. Os dados repõem-se ao recarregar a página |
 | `hooks.ts` | `useProfile`, `useNote`, `useLeaderboard` e `useSkillChain` (mutações com os estados da transacção) |
 | `store.ts` | Invalida os dados depois de uma transacção confirmada |
@@ -98,7 +101,7 @@ Regra seguida: lógica do SDD, visual do design.
 
 ## 7. Pendente
 
-- Receber o IDL e o Program ID e ligar o programa real.
+- Validar o programa real na Devnet (IDL escrito à mão a partir do `lib.rs`; discriminators verificados por SHA-256). Testes unitários do codec em `tests/codec.test.ts`.
 - Substituir o placeholder de `anchor/programs/skillchain/src/lib.rs` pelo código final (só referência; não se corre `anchor build` nem `anchor deploy`).
 - Fases 2 a 5, e Fase 6 se houver tempo.
 - Testes do programa (secção 7 do SDD) e testes do front-end.

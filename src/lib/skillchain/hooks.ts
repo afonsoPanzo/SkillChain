@@ -106,7 +106,7 @@ export function useLeaderboard() {
  * Each mutation resolves with the signature, or null if it failed.
  */
 export function useSkillChain() {
-  const { publicKey } = useWallet();
+  const { publicKey, sendTransaction } = useWallet();
   const [state, setState] = useState<TxState>({ status: "idle" });
   const busyRef = useRef(false);
 
@@ -122,6 +122,7 @@ export function useSkillChain() {
       try {
         const signature = await action({
           owner: publicKey.toBase58(),
+          sendTransaction,
           onConfirming: () => setState({ status: "confirming" }),
         });
         invalidateData();
@@ -135,7 +136,7 @@ export function useSkillChain() {
         busyRef.current = false;
       }
     },
-    [publicKey],
+    [publicKey, sendTransaction],
   );
 
   const reset = useCallback(() => setState({ status: "idle" }), []);
