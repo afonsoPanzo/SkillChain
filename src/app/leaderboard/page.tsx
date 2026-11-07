@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/skillchain/coming-soon";
+import { LeaderboardScreen } from "@/components/skillchain/leaderboard-screen";
 
 export default function LeaderboardPage() {
-  return <ComingSoon title="Ranking" phase={4} />;
+  return <LeaderboardScreen />;
 }

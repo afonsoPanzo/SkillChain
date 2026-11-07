@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter";
 import { useWalletRestoring } from "@/lib/skillchain/use-wallet-restoring";
 import { TOTAL_LEVELS, TOTAL_POINTS } from "@/lib/skillchain/constants";
-import { useProfile } from "@/lib/skillchain/hooks";
+import { useLeaderboard, useProfile } from "@/lib/skillchain/hooks";
+import { getRival } from "@/lib/skillchain/rival";
 import { LESSONS, getLevelPoints } from "@/lib/skillchain/lessons";
 import { getNextReward } from "@/lib/skillchain/rewards";
 import { ConnectButton } from "./connect-button";
+import { RivalCard } from "./rival-card";
 
 type Status = "done" | "available" | "locked";
 
@@ -37,7 +39,8 @@ const CHIP_STYLE: Record<Status, string> = {
 
 export function LearnScreen() {
   const { connected } = useWallet();
-  const { profile, isLoading } = useProfile();
+  const { owner, profile, isLoading } = useProfile();
+  const { all } = useLeaderboard();
   const restoring = useWalletRestoring();
 
   if (restoring) {
@@ -56,6 +59,7 @@ export function LearnScreen() {
 
   const level = profile?.level ?? 0;
   const reward = profile ? getNextReward(profile) : null;
+  const rival = getRival(all, owner);
 
   return (
     <>
@@ -126,6 +130,8 @@ export function LearnScreen() {
           );
         })}
       </div>
+
+      {rival && <RivalCard rival={rival} />}
 
       {reward && (
         <Link

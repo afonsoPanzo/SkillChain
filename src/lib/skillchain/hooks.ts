@@ -81,7 +81,7 @@ export function useNote() {
 /** Level desc, then total earned desc. */
 export function sortLeaderboard(profiles: Profile[]): Profile[] {
   return [...profiles].sort(
-    (a, b) => b.level - a.level || b.totalEarned - a.totalEarned,
+    (a, b) => b.level - a.level || b.totalEarned - a.totalEarned || a.owner.localeCompare(b.owner),
   );
 }
 
