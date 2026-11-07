@@ -33,14 +33,13 @@ function isSolanaAddress(value: string): boolean {
 interface TaskPanelProps {
   lesson: Lesson;
   pointsLabel: string;
-  alreadyDone: boolean;
   tx: TxState;
   /** Runs the on-chain instruction. `input` is the recipient (level 2) or the note (level 3). */
   onSubmit: (input: string) => void;
 }
 
 /** The on-chain task of a level: create profile, send 0.01 SOL, or write a note. */
-export function TaskPanel({ lesson, pointsLabel, alreadyDone, tx, onSubmit }: TaskPanelProps) {
+export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps) {
   const { publicKey } = useWallet();
   const { lamports, isLoading: balanceLoading, error: balanceError } = useBalance(publicKey);
   const [recipient, setRecipient] = useState("");
@@ -70,7 +69,7 @@ export function TaskPanel({ lesson, pointsLabel, alreadyDone, tx, onSubmit }: Ta
   let inputsReady = true;
   if (type === "complete_level_2") inputsReady = recipientValid;
   if (type === "complete_level_3") inputsReady = messageValid;
-  const ready = !alreadyDone && !busy && enoughSol && inputsReady;
+  const ready = !busy && enoughSol && inputsReady;
 
   const label =
     tx.status === "signing"
@@ -117,13 +116,7 @@ export function TaskPanel({ lesson, pointsLabel, alreadyDone, tx, onSubmit }: Ta
           </p>
         </div>
 
-        {alreadyDone && (
-          <div className="rounded-[14px] border border-line bg-surface p-4 text-[15px] text-fg-3">
-            Já concluíste este nível on-chain. Cada nível só pode ser concluído uma vez.
-          </div>
-        )}
-
-        {!alreadyDone && type === "complete_level_2" && (
+        {type === "complete_level_2" && (
           <div className="flex flex-col gap-2.5">
             <label htmlFor="recipient" className="text-sm text-muted">
               Endereço do destinatário
@@ -155,7 +148,7 @@ export function TaskPanel({ lesson, pointsLabel, alreadyDone, tx, onSubmit }: Ta
           </div>
         )}
 
-        {!alreadyDone && type === "complete_level_3" && (
+        {type === "complete_level_3" && (
           <div className="flex flex-col gap-2.5">
             <label htmlFor="note" className="text-sm text-muted">
               A tua nota on-chain
@@ -180,7 +173,7 @@ export function TaskPanel({ lesson, pointsLabel, alreadyDone, tx, onSubmit }: Ta
           </div>
         )}
 
-        {!alreadyDone && (
+        {(
           <div className="flex flex-col gap-3.5 rounded-2xl border border-line bg-surface p-4">
             <div className="flex items-baseline justify-between gap-3">
               <div className="text-sm text-muted">Saldo na Devnet</div>
@@ -221,10 +214,10 @@ export function TaskPanel({ lesson, pointsLabel, alreadyDone, tx, onSubmit }: Ta
           </div>
         )}
 
-        {!alreadyDone && <TxStatus state={tx} />}
+        <TxStatus state={tx} />
       </div>
 
-      {!alreadyDone && (
+      {(
         <button type="button" className="btn btn-primary" disabled={!ready} onClick={submit}>
           {label}
         </button>

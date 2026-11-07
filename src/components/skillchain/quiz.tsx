@@ -13,13 +13,15 @@ interface QuizProps {
   /** Index of the question being shown, for the progress bar. */
   onIndexChange: (index: number) => void;
   onFinish: () => void;
+  /** Label of the button after the last correct answer. */
+  finishLabel: string;
 }
 
 /**
  * One question at a time. A wrong answer shows the explanation and the same
  * question is tried again; there are no lives or timer (cut from the design).
  */
-export function Quiz({ questions, onAnswer, onIndexChange, onFinish }: QuizProps) {
+export function Quiz({ questions, onAnswer, onIndexChange, onFinish, finishLabel }: QuizProps) {
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
 
@@ -106,7 +108,7 @@ export function Quiz({ questions, onAnswer, onIndexChange, onFinish }: QuizProps
             </div>
           </div>
           <button type="button" className={`btn ${correct ? "btn-primary" : "btn-coral"}`} onClick={next}>
-            {!correct ? "Tentar de novo" : isLast ? "Desbloquear tarefa" : "Continuar"}
+            {!correct ? "Tentar de novo" : isLast ? finishLabel : "Continuar"}
           </button>
         </div>
       )}

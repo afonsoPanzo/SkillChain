@@ -8,6 +8,10 @@ export function explorerTxUrl(signature: string): string {
   return `https://explorer.solana.com/tx/${signature}?cluster=${CLUSTER}`;
 }
 
+export function explorerAddressUrl(address: string): string {
+  return `https://explorer.solana.com/address/${address}?cluster=${CLUSTER}`;
+}
+
 /** 1_980_000_000 -> "1,98" (pt-PT, max 4 decimals). */
 export function formatSol(lamports: bigint | number): string {
   const sol = Number(lamports) / LAMPORTS_PER_SOL;

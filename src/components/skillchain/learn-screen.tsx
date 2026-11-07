@@ -12,7 +12,7 @@ import { ConnectButton } from "./connect-button";
 type Status = "done" | "available" | "locked";
 
 const STATUS_LABEL: Record<Status, string> = {
-  done: "Concluído",
+  done: "Concluído ✓",
   available: "Jogar",
   locked: "Bloqueado",
 };

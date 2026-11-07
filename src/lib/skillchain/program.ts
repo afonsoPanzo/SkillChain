@@ -19,20 +19,15 @@ import {
   profileFilters,
 } from "./codec";
 import { SkillChainProgramError, describeTxError } from "./errors";
+import { deriveAddress } from "./pda";
 import { getConnection } from "./rpc";
 import type { Note, Profile, SkillChainBackend, TxContext } from "./types";
-
-const encoder = new TextEncoder();
-
-function seedsFor(prefix: string, owner: PublicKey) {
-  return [encoder.encode(prefix), owner.toBytes()];
-}
 
 export function createProgramBackend(programIdBase58: string): SkillChainBackend {
   const programId = new PublicKey(programIdBase58);
 
-  const pda = async (prefix: string, owner: PublicKey) =>
-    (await PublicKey.findProgramAddress(seedsFor(prefix, owner), programId))[0];
+  const pda = (prefix: "profile" | "note", owner: PublicKey) =>
+    deriveAddress(programId, prefix, owner);
 
   async function fetchAccount(address: PublicKey): Promise<Uint8Array | null> {
     const info = await getConnection().getAccountInfo(address, "confirmed");

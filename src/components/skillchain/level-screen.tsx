@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter";
 import { useWalletRestoring } from "@/lib/skillchain/use-wallet-restoring";
 import { backend } from "@/lib/skillchain/backend";
@@ -9,6 +10,7 @@ import { getLesson, getLevelPoints } from "@/lib/skillchain/lessons";
 import { ConnectButton } from "./connect-button";
 import { LevelComplete } from "./level-complete";
 import { LessonPlayer } from "./lesson-player";
+import { LevelDone } from "./level-done";
 
 function Notice({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -21,7 +23,8 @@ function Notice({ title, children }: { title: string; children: React.ReactNode 
 
 export function LevelScreen({ level }: { level: number }) {
   const { connected } = useWallet();
-  const { profile, isLoading } = useProfile();
+  const { owner, profile, isLoading } = useProfile();
+  const [reviewing, setReviewing] = useState(false);
   const sc = useSkillChain();
   const lesson = getLesson(level);
   const restoring = useWalletRestoring();
@@ -89,6 +92,19 @@ export function LevelScreen({ level }: { level: number }) {
     );
   }
 
+  // Already completed on-chain: show the result first, the lesson only as a review.
+  if (currentLevel >= level && !reviewing && owner) {
+    return (
+      <LevelDone
+        level={level}
+        title={lesson.title}
+        points={getLevelPoints(level)}
+        owner={owner}
+        onReview={() => setReviewing(true)}
+      />
+    );
+  }
+
   function submitTask(input: string) {
     if (lesson?.task.type === "complete_level_2") void sc.completeLevel2(input);
     else if (lesson?.task.type === "complete_level_3") void sc.completeLevel3(input);
@@ -99,9 +115,10 @@ export function LevelScreen({ level }: { level: number }) {
     <LessonPlayer
       lesson={lesson}
       pointsLabel={`+${getLevelPoints(level)} pts`}
-      alreadyDone={currentLevel >= level}
       tx={sc.state}
       onSubmitTask={submitTask}
+      review={currentLevel >= level}
+      onExitReview={() => setReviewing(false)}
     />
   );
 }

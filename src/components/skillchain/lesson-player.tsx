@@ -12,19 +12,23 @@ type Stage = "steps" | "quiz" | "task";
 interface LessonPlayerProps {
   lesson: Lesson;
   pointsLabel: string;
-  alreadyDone: boolean;
   tx: TxState;
   /** Runs the on-chain instruction. `input` is the recipient (level 2) or the note (level 3). */
   onSubmitTask: (input: string) => void;
+  /** Review mode: steps and quiz only, no task and no points promised. */
+  review?: boolean;
+  /** Leaves review mode (back to the completed-level screen). */
+  onExitReview?: () => void;
 }
 
 /** Steps, then quiz, then the on-chain task. The combo is only a visual reward. */
 export function LessonPlayer({
   lesson,
   pointsLabel,
-  alreadyDone,
   tx,
   onSubmitTask,
+  review = false,
+  onExitReview,
 }: LessonPlayerProps) {
   const [stage, setStage] = useState<Stage>("steps");
   const [step, setStep] = useState(0);
@@ -52,6 +56,11 @@ export function LessonPlayer({
         >
           ← Mapa
         </Link>
+        {review && (
+          <div className="rounded-full border border-line px-[9px] py-[3px] font-mono text-xs text-muted">
+            Revisão
+          </div>
+        )}
         {combo >= 2 && (
           <div
             key={comboTick}
@@ -137,7 +146,8 @@ export function LessonPlayer({
           questions={lesson.quiz}
           onAnswer={onAnswer}
           onIndexChange={setQuizIndex}
-          onFinish={() => setStage("task")}
+          onFinish={() => (review ? onExitReview?.() : setStage("task"))}
+          finishLabel={review ? "Concluir revisão" : "Desbloquear tarefa"}
         />
       </>
     );
@@ -149,7 +159,6 @@ export function LessonPlayer({
       <TaskPanel
         lesson={lesson}
         pointsLabel={pointsLabel}
-        alreadyDone={alreadyDone}
         tx={tx}
         onSubmit={onSubmitTask}
       />
