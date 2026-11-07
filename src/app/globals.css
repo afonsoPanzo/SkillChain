@@ -73,17 +73,19 @@ body {
   margin: 0;
   background: var(--color-ink);
   color: var(--color-fg);
-  font-family: var(--font-sans);
+  font-family: var(--font-bricolage), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-a {
-  color: var(--color-lime);
-  text-decoration: none;
-}
-a:hover {
-  color: #7dffc6;
-  text-decoration: underline;
+@layer base {
+  a {
+    color: var(--color-lime);
+    text-decoration: none;
+  }
+  a:hover {
+    color: #7dffc6;
+    text-decoration: underline;
+  }
 }
 
 button,
@@ -123,6 +125,11 @@ textarea {
   .btn-primary:hover {
     color: var(--color-ink);
   }
+  .btn-coral {
+    background: var(--color-coral);
+    color: var(--color-ink);
+    box-shadow: 0 5px 0 var(--color-coral-d);
+  }
   .btn:active:not(:disabled) {
     transform: translateY(5px);
     box-shadow: none;
@@ -143,7 +150,7 @@ textarea {
   border-radius: 10px;
   background-color: var(--color-surface);
   color: var(--color-fg);
-  font-family: var(--font-mono);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
   font-size: 12px;
   font-weight: 600;
   line-height: 32px;

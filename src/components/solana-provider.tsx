@@ -17,7 +17,7 @@ function onWalletError(error: WalletError) {
 export function SolanaProvider({ children }: { children: ReactNode }) {
   return (
     <ConnectionProvider endpoint={DEVNET_RPC}>
-      <WalletProvider chain="solana:devnet" onError={onWalletError}>
+      <WalletProvider chain="solana:devnet" autoConnect onError={onWalletError}>
         <WalletModalProvider>{children}</WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>

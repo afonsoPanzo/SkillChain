@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter";
+import { useWalletRestoring } from "@/lib/skillchain/use-wallet-restoring";
 import { TOTAL_LEVELS, TOTAL_POINTS } from "@/lib/skillchain/constants";
 import { useProfile } from "@/lib/skillchain/hooks";
 import { LESSONS, getLevelPoints } from "@/lib/skillchain/lessons";
@@ -37,6 +38,11 @@ const CHIP_STYLE: Record<Status, string> = {
 export function LearnScreen() {
   const { connected } = useWallet();
   const { profile, isLoading } = useProfile();
+  const restoring = useWalletRestoring();
+
+  if (restoring) {
+    return <p className="m-0 pt-6 text-[15px] text-muted">A ligar a carteira…</p>;
+  }
 
   if (!connected) {
     return (

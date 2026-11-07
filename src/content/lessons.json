@@ -3,8 +3,43 @@
     "level": 1,
     "title": "Carteira",
     "topics": "Carteiras, chaves, SOL e Devnet",
-    "steps": [],
-    "quiz": [],
+    "steps": [
+      {
+        "type": "text",
+        "title": "O que é uma carteira?",
+        "body": "Uma carteira não guarda moedas. Guarda as chaves que provam que uma conta na blockchain é tua."
+      },
+      {
+        "type": "text",
+        "title": "Chave pública e chave privada",
+        "body": "A chave pública é o teu endereço: podes partilhá-la com qualquer pessoa. A chave privada assina as tuas acções. Quem a tiver controla a conta.",
+        "term": "Endereço: 9fRvT3kLmW2pQx8s…7hPq"
+      },
+      {
+        "type": "text",
+        "title": "SOL de teste na Devnet",
+        "body": "A Devnet é a rede de testes da Solana. O SOL aqui não tem valor real e podes pedi-lo de graça no faucet."
+      },
+      {
+        "type": "text",
+        "title": "Porque precisas de SOL?",
+        "body": "Criar uma conta ocupa espaço na blockchain, e esse espaço paga-se em SOL. Por isso, criar o teu perfil prova que já tens SOL e sabes assinar."
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Qual destas nunca deves partilhar?",
+        "options": ["Chave pública", "Chave privada", "Endereço"],
+        "answer": 1,
+        "explanation": "A chave privada assina por ti. Quem a tiver pode mover tudo o que é teu."
+      },
+      {
+        "question": "O SOL da Devnet tem valor real?",
+        "options": ["Sim, igual ao da mainnet", "Não, é só para testes"],
+        "answer": 1,
+        "explanation": "É uma rede de testes: o SOL é gratuito e serve para experimentar."
+      }
+    ],
     "task": {
       "type": "init_profile",
       "title": "Cria o teu perfil on-chain",
@@ -16,8 +51,43 @@
     "level": 2,
     "title": "Transacções",
     "topics": "Assinaturas, taxas, lamports e Explorer",
-    "steps": [],
-    "quiz": [],
+    "steps": [
+      {
+        "type": "text",
+        "title": "O que é uma transacção?",
+        "body": "É um pedido assinado para alterar o estado da blockchain: mover SOL, criar uma conta ou chamar um programa."
+      },
+      {
+        "type": "text",
+        "title": "Assinatura",
+        "body": "A carteira assina com a tua chave privada. A rede confirma que a assinatura corresponde ao teu endereço sem nunca ver a chave."
+      },
+      {
+        "type": "text",
+        "title": "Taxas e lamports",
+        "body": "Cada transacção paga uma pequena taxa. O lamport é a unidade mais pequena de SOL.",
+        "term": "1 SOL = 1 000 000 000 lamports\ntaxa base = 5 000 lamports"
+      },
+      {
+        "type": "text",
+        "title": "O Explorer",
+        "body": "Cada transacção tem uma assinatura única. No Solana Explorer, qualquer pessoa pode ver o que aconteceu."
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Quantos lamports tem 1 SOL?",
+        "options": ["1 000", "1 000 000", "1 000 000 000"],
+        "answer": 2,
+        "explanation": "Mil milhões. É por isso que as taxas parecem números grandes em lamports."
+      },
+      {
+        "question": "Quem assina as tuas transacções?",
+        "options": ["A tua carteira", "O SkillChain", "Um validador"],
+        "answer": 0,
+        "explanation": "Só a tua carteira tem a chave privada. Nenhuma app assina por ti."
+      }
+    ],
     "task": {
       "type": "complete_level_2",
       "title": "Envia 0,01 SOL",
@@ -29,8 +99,43 @@
     "level": 3,
     "title": "Contas",
     "topics": "Contas, rent, programas e PDAs",
-    "steps": [],
-    "quiz": [],
+    "steps": [
+      {
+        "type": "text",
+        "title": "Tudo é uma conta",
+        "body": "Na Solana, os dados vivem em contas. O teu saldo, o teu perfil e os próprios programas são contas."
+      },
+      {
+        "type": "text",
+        "title": "Programas",
+        "body": "Um programa é código publicado na blockchain. Não guarda dados em si: lê e escreve noutras contas."
+      },
+      {
+        "type": "text",
+        "title": "Rent",
+        "body": "Cada conta tem de manter SOL suficiente para o espaço que ocupa. Fechar a conta devolve esse SOL."
+      },
+      {
+        "type": "text",
+        "title": "PDAs",
+        "body": "Uma PDA é um endereço derivado do programa e de sementes. Não tem chave privada: só o programa a pode assinar.",
+        "term": "seeds = [\"profile\", a_tua_carteira]"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Quem pode assinar por uma PDA?",
+        "options": ["O dono da carteira", "O programa que a derivou", "Qualquer validador"],
+        "answer": 1,
+        "explanation": "A PDA não tem chave privada. Só o programa consegue assinar por ela."
+      },
+      {
+        "question": "O que paga o rent?",
+        "options": ["O espaço que a conta ocupa", "Cada clique na app", "O nome da conta"],
+        "answer": 0,
+        "explanation": "Quanto mais dados a conta guarda, mais SOL tem de manter."
+      }
+    ],
     "task": {
       "type": "complete_level_3",
       "title": "Cria uma nota on-chain",

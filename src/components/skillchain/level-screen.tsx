@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter";
+import { useWalletRestoring } from "@/lib/skillchain/use-wallet-restoring";
 import { backend } from "@/lib/skillchain/backend";
 import { useProfile, useSkillChain } from "@/lib/skillchain/hooks";
 import { getLesson, getLevelPoints } from "@/lib/skillchain/lessons";
 import { ConnectButton } from "./connect-button";
 import { LevelComplete } from "./level-complete";
-import { TaskPanel } from "./task-panel";
+import { LessonPlayer } from "./lesson-player";
 
 function Notice({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -23,6 +24,7 @@ export function LevelScreen({ level }: { level: number }) {
   const { profile, isLoading } = useProfile();
   const sc = useSkillChain();
   const lesson = getLesson(level);
+  const restoring = useWalletRestoring();
 
   if (!lesson) return <Notice title="Nível não encontrado">Este nível não existe.</Notice>;
 
@@ -31,6 +33,15 @@ export function LevelScreen({ level }: { level: number }) {
       ← Mapa
     </Link>
   );
+
+  if (restoring) {
+    return (
+      <>
+        {back}
+        <p className="m-0 text-[15px] text-muted">A ligar a carteira…</p>
+      </>
+    );
+  }
 
   if (!connected) {
     return (
@@ -78,33 +89,19 @@ export function LevelScreen({ level }: { level: number }) {
     );
   }
 
-  // Levels 2 and 3 arrive in phase 2.
-  if (level !== 1 && currentLevel < level) {
-    return (
-      <>
-        {back}
-        <Notice title={`Nível ${level} · ${lesson.title}`}>
-          Este nível fica disponível na próxima fase de desenvolvimento.
-        </Notice>
-      </>
-    );
+  function submitTask(input: string) {
+    if (lesson?.task.type === "complete_level_2") void sc.completeLevel2(input);
+    else if (lesson?.task.type === "complete_level_3") void sc.completeLevel3(input);
+    else void sc.initProfile();
   }
 
   return (
-    <>
-      <div className="flex flex-col gap-3">
-        {back}
-        <div className="font-mono text-xs text-muted">
-          Nv {level} · {lesson.title}
-        </div>
-      </div>
-      <TaskPanel
-        lesson={lesson}
-        pointsLabel={`+${getLevelPoints(level)} pts`}
-        alreadyDone={currentLevel >= level}
-        tx={sc.state}
-        onSubmit={() => void sc.initProfile()}
-      />
-    </>
+    <LessonPlayer
+      lesson={lesson}
+      pointsLabel={`+${getLevelPoints(level)} pts`}
+      alreadyDone={currentLevel >= level}
+      tx={sc.state}
+      onSubmitTask={submitTask}
+    />
   );
 }

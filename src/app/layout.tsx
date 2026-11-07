@@ -35,8 +35,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-PT">
-      <body className={`${bricolage.variable} ${jetbrains.variable}`}>
+    <html lang="pt-PT" className={`${bricolage.variable} ${jetbrains.variable}`}>
+      <body suppressHydrationWarning>
         <Providers>
           <div className="flex min-h-screen justify-center bg-ink">
             <div className="flex min-h-screen w-full max-w-[480px] flex-col border-x border-divider">

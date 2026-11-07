@@ -10,5 +10,5 @@ export default async function LevelPage({
   const { level } = await params;
   const n = Number(level);
   if (!Number.isInteger(n) || n < 1 || n > TOTAL_LEVELS) notFound();
-  return <LevelScreen level={n} />;
+  return <LevelScreen key={n} level={n} />;
 }

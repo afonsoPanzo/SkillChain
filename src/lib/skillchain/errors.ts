@@ -100,6 +100,9 @@ export function toUserMessage(err: unknown): string {
     if (new RegExp(`\\b${name}\\b`).test(text)) return message;
   }
 
+  if (/AccountOwnedByWrongProgram|owned by a different program/i.test(text)) {
+    return "O destinatário tem de ser uma carteira normal, não uma conta de programa.";
+  }
   if (/already in use/i.test(text)) return "O teu perfil já existe.";
   if (/insufficient (?:funds|lamports)|attempt to debit an account/i.test(text)) {
     return "Não tens SOL suficiente para esta transacção.";

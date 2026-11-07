@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter";
+import { useWalletRestoring } from "@/lib/skillchain/use-wallet-restoring";
 import { FAUCET_URL, TOTAL_LEVELS, TOTAL_POINTS } from "@/lib/skillchain/constants";
 import { ConnectButton } from "./connect-button";
 
@@ -13,6 +14,7 @@ const LOOP = [
 
 export function HomeScreen() {
   const { connected } = useWallet();
+  const restoring = useWalletRestoring();
 
   return (
     <div className="flex flex-col gap-7 pt-5">
@@ -43,7 +45,9 @@ export function HomeScreen() {
       </div>
 
       <div className="flex flex-col gap-3.5">
-        {connected ? (
+        {restoring ? (
+          <div className="btn btn-primary opacity-60">A ligar a carteira…</div>
+        ) : connected ? (
           <Link href="/learn" className="btn btn-primary">
             Começar
           </Link>

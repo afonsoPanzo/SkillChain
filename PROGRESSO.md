@@ -8,8 +8,8 @@ Este documento resume o que foi feito até agora, as decisões tomadas e o que f
 
 | Fase | Descrição | Estado |
 | --- | --- | --- |
-| 1 | Base: carteira, ler perfil, criar perfil em `/learn/1` | Feita, com dados simulados (mock) |
-| 2 | Três níveis completos (lições, quiz, tarefas) | Por fazer |
+| 1 | Base: carteira, ler perfil, criar perfil em `/learn/1` | Feita e validada na Devnet |
+| 2 | Três níveis completos (lições, quiz, tarefas) | Feita, por validar na Devnet |
 | 3 | Loja, perfil com inventário, avatar em camadas | Por fazer |
 | 4 | Ranking e testes | Por fazer |
 | 5 | Entrega (Vercel, README, vídeo, Devpost) | Por fazer |

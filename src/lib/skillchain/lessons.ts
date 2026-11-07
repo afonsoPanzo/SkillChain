@@ -6,7 +6,7 @@ export interface LessonStep {
   title: string;
   body: string;
   /** Optional "Na prática" code box. */
-  code?: string;
+  term?: string;
 }
 
 export interface QuizQuestion {
