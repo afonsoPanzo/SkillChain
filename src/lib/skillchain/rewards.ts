@@ -1,4 +1,5 @@
 import { ITEMS, hasItem } from "./constants";
+import { itemKey, type TFunction } from "../../i18n/translate";
 import type { Profile } from "./types";
 
 export interface NextReward {
@@ -10,12 +11,12 @@ export interface NextReward {
 }
 
 /** The item the player should aim for next, derived from constants only. */
-export function getNextReward(profile: Profile): NextReward {
+export function getNextReward(profile: Profile, t: TFunction): NextReward {
   const missing = ITEMS.filter((item) => !hasItem(profile.items, item.id)).sort(
     (a, b) => a.price - b.price,
   );
   if (missing.length === 0) {
-    return { text: "Já tens todos os itens", count: "", percent: 100 };
+    return { text: t("reward.all"), count: "", percent: 100 };
   }
 
   const buyable = missing.find(
@@ -24,11 +25,12 @@ export function getNextReward(profile: Profile): NextReward {
   const target =
     buyable ?? missing.find((item) => profile.level >= item.minLevel) ?? missing[0];
 
+  const item = t(itemKey(target.id));
   const text = buyable
-    ? `Já podes desbloquear: ${target.name}`
+    ? t("reward.buy", { item })
     : profile.level < target.minLevel
-      ? `${target.name} desbloqueia no nível ${target.minLevel}`
-      : `Faltam ${target.price - profile.points} pts para ${target.name}`;
+      ? t("reward.level", { item, n: target.minLevel })
+      : t("reward.need", { item, n: target.price - profile.points });
 
   return {
     text,

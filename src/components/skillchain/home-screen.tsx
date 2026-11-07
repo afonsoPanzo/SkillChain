@@ -4,30 +4,31 @@ import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter";
 import { useWalletRestoring } from "@/lib/skillchain/use-wallet-restoring";
 import { FAUCET_URL, TOTAL_LEVELS, TOTAL_POINTS } from "@/lib/skillchain/constants";
+import { useT } from "@/i18n/use-t";
 import { ConnectButton } from "./connect-button";
 
 const LOOP = [
-  { n: "01", title: "Lê", sub: "Ecrãs curtos" },
-  { n: "02", title: "Responde", sub: "Quiz" },
-  { n: "03", title: "Assina", sub: "Tarefa on-chain" },
+  { n: "01", title: "home.loop.1.title", sub: "home.loop.1.sub" },
+  { n: "02", title: "home.loop.2.title", sub: "home.loop.2.sub" },
+  { n: "03", title: "home.loop.3.title", sub: "home.loop.3.sub" },
 ] as const;
 
 export function HomeScreen() {
   const { connected } = useWallet();
   const restoring = useWalletRestoring();
+  const { t } = useT();
 
   return (
     <div className="flex flex-col gap-7 pt-5">
       <div className="flex flex-col gap-4">
         <div className="font-mono text-xs tracking-[0.08em] text-muted uppercase">
-          {TOTAL_LEVELS} níveis · {TOTAL_POINTS} pontos · 100% on-chain
+          {t("home.kicker", { levels: TOTAL_LEVELS, points: TOTAL_POINTS })}
         </div>
         <h1 className="m-0 text-[46px] leading-[1.05] font-extrabold tracking-[-0.035em] text-balance">
-          Aprende Solana <span className="text-lime">a jogar.</span>
+          {t("home.heroA")} <span className="text-lime">{t("home.heroB")}</span>
         </h1>
         <p className="m-0 text-[17px] leading-normal text-fg-3 text-pretty">
-          Cada nível termina com uma tarefa real na blockchain. A transacção que assinas é a
-          prova de que passaste.
+          {t("home.sub")}
         </p>
       </div>
 
@@ -38,26 +39,26 @@ export function HomeScreen() {
             className="flex flex-col gap-1.5 rounded-[14px] border border-line bg-surface p-3.5"
           >
             <div className="font-mono text-xs text-lime">{step.n}</div>
-            <div className="text-[15px] font-bold">{step.title}</div>
-            <div className="text-[13px] leading-snug text-muted">{step.sub}</div>
+            <div className="text-[15px] font-bold">{t(step.title)}</div>
+            <div className="text-[13px] leading-snug text-muted">{t(step.sub)}</div>
           </div>
         ))}
       </div>
 
       <div className="flex flex-col gap-3.5">
         {restoring ? (
-          <div className="btn btn-primary opacity-60">A ligar a carteira…</div>
+          <div className="btn btn-primary opacity-60">{t("common.connecting")}</div>
         ) : connected ? (
           <Link href="/learn" className="btn btn-primary">
-            Começar
+            {t("home.start")}
           </Link>
         ) : (
           <ConnectButton />
         )}
         <div className="text-center text-sm text-muted">
-          Sem SOL de teste?{" "}
+          {t("home.faucetPre")}{" "}
           <a href={FAUCET_URL} target="_blank" rel="noopener noreferrer">
-            Pede no faucet da Devnet.
+            {t("home.faucetLink")}
           </a>
         </div>
       </div>

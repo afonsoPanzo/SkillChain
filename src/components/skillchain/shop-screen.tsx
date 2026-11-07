@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter";
+import { itemKey, type TFunction } from "@/i18n/translate";
+import { useT } from "@/i18n/use-t";
 import {
-  CATEGORY_LABEL,
   ITEMS,
   ITEMS_TOTAL_PRICE,
   NONE,
@@ -29,35 +30,36 @@ function statusOf(item: ItemDef, profile: Profile | null): ItemStatus {
   return "available";
 }
 
-function labelOf(item: ItemDef, status: ItemStatus, profile: Profile | null): string {
+function labelOf(item: ItemDef, status: ItemStatus, profile: Profile | null, t: TFunction): string {
   switch (status) {
     case "noprofile":
-      return "Conclui o nível 1";
+      return t("shop.status.noProfile");
     case "owned":
-      return "Comprado";
+      return t("shop.status.owned");
     case "level":
-      return `Requer nível ${item.minLevel}`;
+      return t("shop.status.level", { n: item.minLevel });
     case "points":
-      return `Faltam ${item.price - (profile?.points ?? 0)} pts`;
+      return t("shop.status.points", { n: item.price - (profile?.points ?? 0) });
     default:
-      return `Comprar · ${item.price}`;
+      return t("shop.buy", { n: item.price });
   }
 }
 
 export function ShopScreen() {
   const { connected } = useWallet();
   const restoring = useWalletRestoring();
+  const { t } = useT();
   const { owner, profile, isLoading } = useProfile();
   const sc = useSkillChain();
   const [buyingId, setBuyingId] = useState<number | null>(null);
 
-  if (restoring) return <p className="m-0 pt-6 text-[15px] text-muted">A ligar a carteira…</p>;
+  if (restoring) return <p className="m-0 pt-6 text-[15px] text-muted">{t("common.connecting")}</p>;
 
   if (!connected || !owner) {
     return (
       <div className="flex flex-col gap-4 pt-6">
-        <h2 className="m-0 text-[32px] font-extrabold tracking-[-0.03em]">Loja</h2>
-        <p className="m-0 text-[15px] text-muted">Liga a carteira para ver a loja.</p>
+        <h2 className="m-0 text-[32px] font-extrabold tracking-[-0.03em]">{t("shop.kicker")}</h2>
+        <p className="m-0 text-[15px] text-muted">{t("shop.connectPrompt")}</p>
         <ConnectButton />
       </div>
     );
@@ -72,16 +74,16 @@ export function ShopScreen() {
   return (
     <>
       <div className="flex flex-col gap-1.5">
-        <div className="font-mono text-xs tracking-[0.08em] text-muted uppercase">Loja</div>
+        <div className="font-mono text-xs tracking-[0.08em] text-muted uppercase">{t("shop.kicker")}</div>
         <h2 className="m-0 text-[32px] font-extrabold tracking-[-0.03em]">
-          Tens <span className="text-lime">{profile?.points ?? 0}</span> pontos
+          {t("shop.havePre")} <span className="text-lime">{profile?.points ?? 0}</span> {t("shop.havePost")}
         </h2>
         <div className="text-[15px] leading-snug text-muted">
-          Podes ganhar {TOTAL_POINTS} no total. Os itens custam {ITEMS_TOTAL_PRICE}. Escolhe bem.
+          {t("shop.sub", { total: TOTAL_POINTS, price: ITEMS_TOTAL_PRICE })}
         </div>
       </div>
 
-      {isLoading && <p className="m-0 text-[15px] text-muted">A ler o teu perfil…</p>}
+      {isLoading && <p className="m-0 text-[15px] text-muted">{t("common.loadingProfile")}</p>}
 
       <div className="grid grid-cols-2 gap-3">
         {ITEMS.map((item) => {
@@ -100,7 +102,7 @@ export function ShopScreen() {
               <div className="flex aspect-square items-center justify-center rounded-xl bg-ink p-3.5">
                 {item.category === "title" ? (
                   <div className="rounded-full border-[1.5px] border-violet px-3 py-1.5 text-center text-[15px] font-bold text-violet">
-                    {item.name}
+                    {t(itemKey(item.id))}
                   </div>
                 ) : (
                   <div className="size-full">
@@ -113,9 +115,9 @@ export function ShopScreen() {
                 )}
               </div>
               <div className="flex flex-col gap-[3px] px-0.5">
-                <div className="text-base leading-[1.2] font-bold">{item.name}</div>
+                <div className="text-base leading-[1.2] font-bold">{t(itemKey(item.id))}</div>
                 <div className="text-[13px] text-muted">
-                  {CATEGORY_LABEL[item.category]} · Nv {item.minLevel}
+                  {t("shop.meta", { category: t(`category.${item.category}`), n: item.minLevel })}
                 </div>
               </div>
               <div className="h-1.5 overflow-hidden rounded-[3px] bg-ink">
@@ -136,9 +138,9 @@ export function ShopScreen() {
               >
                 {isBusy
                   ? sc.state.status === "confirming"
-                    ? "A confirmar…"
-                    : "A assinar…"
-                  : labelOf(item, status, profile)}
+                    ? t("task.confirming")
+                    : t("task.signing")
+                  : labelOf(item, status, profile, t)}
               </button>
             </div>
           );
@@ -147,7 +149,7 @@ export function ShopScreen() {
 
       {!profile && !isLoading && (
         <Link href="/learn/1" className="btn btn-primary">
-          Começar o nível 1
+          {t("shop.startLevel1")}
         </Link>
       )}
 

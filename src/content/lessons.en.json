@@ -1,0 +1,146 @@
+[
+  {
+    "level": 1,
+    "title": "Wallet",
+    "topics": "Wallets, keys, SOL and Devnet",
+    "steps": [
+      {
+        "type": "text",
+        "title": "What is a wallet?",
+        "body": "A wallet doesn't hold coins. It holds the keys that prove an account on the blockchain is yours."
+      },
+      {
+        "type": "text",
+        "title": "Public and private keys",
+        "body": "Your public key is your address: share it with anyone. Your private key signs your actions. Whoever has it controls the account.",
+        "term": "Address: 9fRvT3kLmW2pQx8s…7hPq"
+      },
+      {
+        "type": "text",
+        "title": "Test SOL on Devnet",
+        "body": "Devnet is Solana's test network. SOL here has no real value, and you can get it for free from the faucet."
+      },
+      {
+        "type": "text",
+        "title": "Why do you need SOL?",
+        "body": "Creating an account takes up space on the blockchain, and that space is paid for in SOL. So creating your profile proves you have SOL and know how to sign."
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Which one should you never share?",
+        "options": ["Public key", "Private key", "Address"],
+        "answer": 1,
+        "explanation": "Your private key signs for you. Whoever has it can move everything you own."
+      },
+      {
+        "question": "Does Devnet SOL have real value?",
+        "options": ["Yes, same as mainnet", "No, it's for testing only"],
+        "answer": 1,
+        "explanation": "It's a test network: SOL is free and meant for experimenting."
+      }
+    ],
+    "task": {
+      "type": "init_profile",
+      "title": "Create your on-chain profile",
+      "description": "This creates your player account. It stores your level, points and items, and pays a small rent in SOL.",
+      "button": "Create profile"
+    }
+  },
+  {
+    "level": 2,
+    "title": "Transactions",
+    "topics": "Signatures, fees, lamports and Explorer",
+    "steps": [
+      {
+        "type": "text",
+        "title": "What is a transaction?",
+        "body": "A signed request to change the state of the blockchain: move SOL, create an account or call a program."
+      },
+      {
+        "type": "text",
+        "title": "Signatures",
+        "body": "Your wallet signs with your private key. The network checks that the signature matches your address without ever seeing the key."
+      },
+      {
+        "type": "text",
+        "title": "Fees and lamports",
+        "body": "Every transaction pays a small fee. A lamport is the smallest unit of SOL.",
+        "term": "1 SOL = 1,000,000,000 lamports\nbase fee = 5,000 lamports"
+      },
+      {
+        "type": "text",
+        "title": "The Explorer",
+        "body": "Every transaction has a unique signature. On Solana Explorer, anyone can see what happened."
+      }
+    ],
+    "quiz": [
+      {
+        "question": "How many lamports are in 1 SOL?",
+        "options": ["1,000", "1,000,000", "1,000,000,000"],
+        "answer": 2,
+        "explanation": "One billion. That's why fees look like big numbers in lamports."
+      },
+      {
+        "question": "Who signs your transactions?",
+        "options": ["Your wallet", "SkillChain", "A validator"],
+        "answer": 0,
+        "explanation": "Only your wallet holds the private key. No app signs for you."
+      }
+    ],
+    "task": {
+      "type": "complete_level_2",
+      "title": "Send 0.01 SOL",
+      "description": "The transfer is made by the program instruction that completes the level. Pick an address that isn't yours.",
+      "button": "Send 0.01 SOL"
+    }
+  },
+  {
+    "level": 3,
+    "title": "Accounts",
+    "topics": "Accounts, rent, programs and PDAs",
+    "steps": [
+      {
+        "type": "text",
+        "title": "Everything is an account",
+        "body": "On Solana, data lives in accounts. Your balance, your profile and programs themselves are all accounts."
+      },
+      {
+        "type": "text",
+        "title": "Programs",
+        "body": "A program is code deployed on the blockchain. It doesn't store data itself: it reads and writes other accounts."
+      },
+      {
+        "type": "text",
+        "title": "Rent",
+        "body": "Every account must hold enough SOL for the space it uses. Closing the account gives that SOL back."
+      },
+      {
+        "type": "text",
+        "title": "PDAs",
+        "body": "A PDA is an address derived from a program and some seeds. It has no private key: only the program can sign for it.",
+        "term": "seeds = [\"profile\", your_wallet]"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Who can sign for a PDA?",
+        "options": ["The wallet owner", "The program that derived it", "Any validator"],
+        "answer": 1,
+        "explanation": "A PDA has no private key. Only its program can sign for it."
+      },
+      {
+        "question": "What does rent pay for?",
+        "options": ["The space the account uses", "Every click in the app", "The account name"],
+        "answer": 0,
+        "explanation": "The more data an account stores, the more SOL it must hold."
+      }
+    ],
+    "task": {
+      "type": "complete_level_3",
+      "title": "Create an on-chain note",
+      "description": "Your note will live in a PDA derived from your wallet. Write anything you like, up to 100 characters.",
+      "button": "Create note"
+    }
+  }
+]

@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { PublicKey } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter";
+import { useT } from "@/i18n/use-t";
 import {
   BASE_FEE_LAMPORTS,
   FAUCET_URL,
+  LAMPORTS_PER_SOL,
   MAX_NOTE_LENGTH,
   TRANSFER_LAMPORTS,
 } from "@/lib/skillchain/constants";
@@ -41,6 +43,7 @@ interface TaskPanelProps {
 /** The on-chain task of a level: create profile, send 0.01 SOL, or write a note. */
 export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps) {
   const { publicKey } = useWallet();
+  const { t, lang, formatNumber } = useT();
   const { lamports, isLoading: balanceLoading, error: balanceError } = useBalance(publicKey);
   const [recipient, setRecipient] = useState("");
   const [message, setMessage] = useState("");
@@ -73,11 +76,11 @@ export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps)
 
   const label =
     tx.status === "signing"
-      ? "A aguardar assinatura…"
+      ? t("task.signing")
       : tx.status === "confirming"
-        ? "A confirmar…"
+        ? t("task.confirming")
         : tx.status === "error"
-          ? "Tentar de novo"
+          ? t("task.retry")
           : lesson.task.button;
 
   function submit() {
@@ -86,17 +89,17 @@ export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps)
     else onSubmit("");
   }
 
-  let recipientHint = "Endereço Solana em base58";
+  let recipientHint = t("task.recipient.hint");
   let recipientHintColor = "text-muted";
   if (recipientText) {
     if (recipientSelf) {
-      recipientHint = "O destinatário não pode ser a tua própria carteira.";
+      recipientHint = t("task.recipient.self");
       recipientHintColor = "text-coral-t";
     } else if (!recipientFormat) {
-      recipientHint = "Endereço inválido.";
+      recipientHint = t("task.recipient.invalid");
       recipientHintColor = "text-coral-t";
     } else {
-      recipientHint = "Endereço válido";
+      recipientHint = t("task.recipient.valid");
       recipientHintColor = "text-lime";
     }
   }
@@ -106,7 +109,7 @@ export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps)
       <div className="flex flex-1 flex-col gap-5">
         <div className="flex flex-col gap-2.5">
           <div className="font-mono text-xs tracking-[0.08em] text-lime uppercase">
-            Tarefa on-chain · {pointsLabel}
+            {t("task.kicker", { points: pointsLabel })}
           </div>
           <h2 className="m-0 text-[30px] leading-[1.08] font-extrabold tracking-[-0.03em] text-balance">
             {lesson.task.title}
@@ -119,14 +122,14 @@ export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps)
         {type === "complete_level_2" && (
           <div className="flex flex-col gap-2.5">
             <label htmlFor="recipient" className="text-sm text-muted">
-              Endereço do destinatário
+              {t("task.recipient.label")}
             </label>
             <input
               id="recipient"
               value={recipient}
               onChange={(e) => setRecipient(e.target.value)}
               disabled={busy}
-              placeholder="Cola um endereço Solana"
+              placeholder={t("task.recipient.placeholder")}
               spellCheck={false}
               autoComplete="off"
               className={`h-[52px] rounded-xl border-[1.5px] bg-surface px-3.5 font-mono text-[13px] text-fg outline-none ${
@@ -137,11 +140,16 @@ export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps)
             {recipientValid && (
               <div className="flex flex-col gap-2 rounded-[14px] border border-line bg-surface px-4 py-3.5">
                 <div className="text-[15px]">
-                  Vais enviar <b className="text-lime">0,01 SOL</b> para{" "}
+                  {t("task.send.pre")}{" "}
+                  <b className="text-lime">{formatNumber(TRANSFER_LAMPORTS / LAMPORTS_PER_SOL, 2)} SOL</b>{" "}
+                  {t("task.send.to")}{" "}
                   <span className="font-mono">{shortAddress(recipientText)}</span>
                 </div>
                 <div className="font-mono text-xs text-muted">
-                  = 10 000 000 lamports + taxa de 5 000
+                  {t("task.send.lamports", {
+                    amount: formatNumber(TRANSFER_LAMPORTS),
+                    fee: formatNumber(BASE_FEE_LAMPORTS),
+                  })}
                 </div>
               </div>
             )}
@@ -151,7 +159,7 @@ export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps)
         {type === "complete_level_3" && (
           <div className="flex flex-col gap-2.5">
             <label htmlFor="note" className="text-sm text-muted">
-              A tua nota on-chain
+              {t("task.note.label")}
             </label>
             <textarea
               id="note"
@@ -159,7 +167,7 @@ export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps)
               onChange={(e) => setMessage(e.target.value)}
               disabled={busy}
               rows={3}
-              placeholder="Escreve uma mensagem para ficar na blockchain"
+              placeholder={t("task.note.placeholder")}
               className="resize-none rounded-xl border-[1.5px] border-line bg-surface p-3.5 text-base leading-[1.45] text-fg outline-none"
             />
             <div className="flex justify-between gap-3 font-mono text-[13px]">
@@ -176,7 +184,7 @@ export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps)
         {(
           <div className="flex flex-col gap-3.5 rounded-2xl border border-line bg-surface p-4">
             <div className="flex items-baseline justify-between gap-3">
-              <div className="text-sm text-muted">Saldo na Devnet</div>
+              <div className="text-sm text-muted">{t("task.balance.label")}</div>
               <div
                 className={`font-mono text-xl font-semibold ${
                   enoughSol || balanceLoading ? "text-fg" : "text-coral-t"
@@ -186,15 +194,15 @@ export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps)
                   ? "…"
                   : balanceError || lamports === null
                     ? "—"
-                    : `${formatSol(lamports)} SOL`}
+                    : `${formatSol(lamports, lang)} SOL`}
               </div>
             </div>
             {!balanceLoading && !balanceError && !enoughSol && (
               <div className="flex flex-col gap-2.5 border-t border-line pt-3.5">
                 <p className="m-0 text-[15px] leading-snug">
                   {!hasSol
-                    ? "Precisas de SOL de teste para pagar o rent da conta."
-                    : "Não tens SOL suficiente para esta tarefa."}
+                    ? t("task.balance.needSol")
+                    : t("task.balance.notEnough")}
                 </p>
                 <a
                   href={FAUCET_URL}
@@ -202,13 +210,13 @@ export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps)
                   rel="noopener noreferrer"
                   className="text-[15px] font-bold"
                 >
-                  Abrir o faucet ↗
+                  {t("common.openFaucet")}
                 </a>
               </div>
             )}
             {balanceError && (
               <p className="m-0 text-sm text-coral-t">
-                Não foi possível ler o saldo. Verifica a ligação à Devnet.
+                {t("task.balance.error")}
               </p>
             )}
           </div>

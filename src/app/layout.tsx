@@ -21,7 +21,7 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "SkillChain",
   description:
-    "Aprende Solana a jogar. Cada nível termina com uma transacção real na Devnet.",
+    "Learn Solana by playing. Every level ends with a real transaction on Devnet.",
   icons: { icon: "/icon.svg" },
 };
 
@@ -35,7 +35,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-PT" className={`${bricolage.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${bricolage.variable} ${jetbrains.variable}`}>
       <body suppressHydrationWarning>
         <Providers>
           <div className="flex min-h-screen justify-center bg-ink">

@@ -2,20 +2,40 @@
 
 import Link from "next/link";
 import { WalletMultiButton, useWallet } from "@solana/wallet-adapter";
+import { setLang } from "@/i18n/lang";
+import { useT } from "@/i18n/use-t";
 import { backend } from "@/lib/skillchain/backend";
 import { useProfile } from "@/lib/skillchain/hooks";
 import { ProfileAvatar } from "./avatar";
 
+/** Language switch: shows the language you will get, like the original design. */
+function LanguageToggle() {
+  const { t, lang } = useT();
+  const next = lang === "en" ? "pt" : "en";
+  return (
+    <button
+      type="button"
+      onClick={() => setLang(next)}
+      aria-label={t("lang.switchAria")}
+      lang={next}
+      className="h-[34px] min-w-[38px] cursor-pointer rounded-[10px] border border-line bg-surface px-2 font-mono text-xs font-semibold text-fg uppercase hover:border-lime"
+    >
+      {next}
+    </button>
+  );
+}
+
 export function SiteHeader() {
   const { connected } = useWallet();
   const { profile } = useProfile();
+  const { t } = useT();
 
   return (
-    <header className="sticky top-0 z-10 flex items-center justify-between gap-2.5 border-b border-divider bg-ink/90 px-4 py-3 backdrop-blur-[10px]">
+    <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-x-2.5 gap-y-2 border-b border-divider bg-ink/90 px-4 py-3 backdrop-blur-[10px]">
       <Link
         href="/"
         className="flex items-center gap-2 text-fg hover:no-underline"
-        aria-label="SkillChain, página inicial"
+        aria-label={t("header.homeAria")}
       >
         <span className="text-[19px] font-extrabold tracking-[-0.02em]">
           Skill
@@ -29,27 +49,26 @@ export function SiteHeader() {
         {backend.isMock && (
           <span
             className="rounded-full border border-coral-d px-[7px] py-[3px] font-mono text-[10px] font-semibold tracking-[0.06em] text-coral-t uppercase"
-            title="Dados simulados em memória: ainda não está ligado ao programa"
+            title={t("header.mockTitle")}
           >
             Mock
           </span>
         )}
       </Link>
-      {connected && (
-        <div className="flex items-center gap-2">
-          {profile && (
-            <span className="font-mono text-[13px] font-semibold text-lime">
-              {profile.points} pts
-            </span>
-          )}
-          {profile && (
-            <Link href="/profile" className="block size-[34px]" aria-label="O teu perfil">
-              <ProfileAvatar profile={profile} />
-            </Link>
-          )}
-          <WalletMultiButton />
-        </div>
-      )}
+      <div className="flex items-center gap-2">
+        {connected && profile && (
+          <span className="font-mono text-[13px] font-semibold text-lime">
+            {t("header.points", { n: profile.points })}
+          </span>
+        )}
+        {connected && profile && (
+          <Link href="/profile" className="block size-[34px]" aria-label={t("header.profileAria")}>
+            <ProfileAvatar profile={profile} />
+          </Link>
+        )}
+        <LanguageToggle />
+        {connected && <WalletMultiButton />}
+      </div>
     </header>
   );
 }

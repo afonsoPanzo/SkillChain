@@ -11,6 +11,7 @@ import {
   instructionDiscriminator,
   profileFilters,
 } from "../src/lib/skillchain/codec";
+import { makeT } from "../src/i18n/translate";
 import { extractCustomCode, toUserMessage } from "../src/lib/skillchain/errors";
 
 const OWNER = new PublicKey("AqdB1HaXB8wnvwGFTNsxTRrpSNMMVs2x5t4bz6UxU2X7");
@@ -152,12 +153,13 @@ describe("program errors", () => {
     expect(extractCustomCode("nothing here")).toBeNull();
   });
 
-  it("maps all 11 codes to Portuguese messages", () => {
-    for (let code = 6000; code <= 6010; code++) {
-      const msg = toUserMessage(new Error(`{"Custom":${code}}`));
-      expect(msg).not.toMatch(/Não foi possível concluir/);
+  it("maps all 11 codes to a message in both languages", () => {
+    for (const lang of ["en", "pt"] as const) {
+      const t = makeT(lang);
+      for (let code = 6000; code <= 6010; code++) {
+        const msg = toUserMessage(new Error(`{"Custom":${code}}`), t);
+        expect(msg).not.toBe(t("error.generic"));
+      }
     }
-    expect(toUserMessage(new Error('{"Custom":6009}'))).toBe("Espaço de equipamento inválido.");
-    expect(toUserMessage(new Error('{"Custom":6010}'))).toBe("Erro de cálculo de pontos.");
   });
 });

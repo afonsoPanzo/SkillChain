@@ -28,7 +28,6 @@ export type ItemCategory = keyof typeof ITEM_CATEGORY;
 export interface ItemDef {
   id: number;
   category: ItemCategory;
-  name: string;
   price: number;
   /** Minimum `profile.level` required to buy the item. */
   minLevel: number;
@@ -40,7 +39,6 @@ export const ITEMS: readonly ItemDef[] = [
   {
     id: 0,
     category: "frame",
-    name: "Moldura Devnet",
     price: 100,
     minLevel: 1,
     asset: "/items/avatar-frame-devnet.svg",
@@ -48,7 +46,6 @@ export const ITEMS: readonly ItemDef[] = [
   {
     id: 1,
     category: "frame",
-    name: "Moldura Validador",
     price: 250,
     minLevel: 3,
     asset: "/items/avatar-frame-validator.svg",
@@ -56,7 +53,6 @@ export const ITEMS: readonly ItemDef[] = [
   {
     id: 2,
     category: "accessory",
-    name: "Óculos Turbo",
     price: 150,
     minLevel: 2,
     asset: "/items/avatar-turbo-goggles.svg",
@@ -64,7 +60,6 @@ export const ITEMS: readonly ItemDef[] = [
   {
     id: 3,
     category: "title",
-    name: "Mestre das PDAs",
     price: 200,
     minLevel: 3,
     asset: null,
@@ -73,11 +68,6 @@ export const ITEMS: readonly ItemDef[] = [
 
 export const ITEMS_TOTAL_PRICE = ITEMS.reduce((sum, item) => sum + item.price, 0);
 
-export const CATEGORY_LABEL: Record<ItemCategory, string> = {
-  frame: "Moldura",
-  accessory: "Acessório",
-  title: "Título",
-};
 
 export function getItem(id: number): ItemDef | undefined {
   return ITEMS.find((item) => item.id === id);

@@ -11,7 +11,7 @@ Este documento resume o que foi feito até agora, as decisões tomadas e o que f
 | 1 | Base: carteira, ler perfil, criar perfil em `/learn/1` | Feita e validada na Devnet |
 | 2 | Três níveis completos (lições, quiz, tarefas) | Feita e validada na Devnet |
 | 3 | Loja, perfil com inventário, avatar em camadas | Feita e validada na Devnet |
-| 4 | Ranking e cartão de rival | Feita, por validar na Devnet |
+| 4 | Ranking e cartão de rival | Feita e validada na Devnet |
 | 5 | Entrega (Vercel, README, vídeo, Devpost) | Por fazer |
 | 6 | Certificado NFT (opcional) | Por fazer |
 
@@ -98,6 +98,15 @@ Regra seguida: lógica do SDD, visual do design.
 - No mock, a assinatura é aleatória e não existe no Explorer. O ecrã de conclusão avisa disso.
 - O `lessons.json` tem para já só título, tópicos e tarefa. Passos e quiz entram na Fase 2.
 - Os níveis 2 e 3 mostram «disponível na próxima fase».
+
+## Idiomas
+
+A interface está em inglês por defeito, com português (PT-PT) como segunda língua. O botão EN/PT no cabeçalho guarda a escolha em `localStorage` (`skillchain.lang`) e actualiza o `lang` do `<html>`.
+
+- Dicionários: `src/i18n/en.ts` (fonte das chaves) e `src/i18n/pt.ts` (`Record<TKey, string>`, o TypeScript falha se faltar ou sobrar uma chave). Hook `useT()` em `src/i18n/use-t.tsx`.
+- Lições: `src/content/lessons.en.json` e `lessons.pt.json`, com a mesma estrutura (testada em `tests/i18n.test.ts`).
+- Números seguem a língua (`0.5 SOL` / `0,5 SOL`). Termos técnicos (PDA, rent, lamports) ficam em inglês nas duas.
+- Os textos do botão e do modal da carteira vêm da biblioteca do Wallet Adapter e ficam em inglês.
 
 ## 7. Pendente
 

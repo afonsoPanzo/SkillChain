@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useT } from "@/i18n/use-t";
 import type { QuizQuestion } from "@/lib/skillchain/lessons";
 
-const RIGHT_WORDS = ["Boa!", "Certo!", "Exactamente."];
+const RIGHT_WORDS = ["quiz.right.0", "quiz.right.1", "quiz.right.2"] as const;
 const KEYS = "ABCD";
 
 interface QuizProps {
@@ -22,6 +23,7 @@ interface QuizProps {
  * question is tried again; there are no lives or timer (cut from the design).
  */
 export function Quiz({ questions, onAnswer, onIndexChange, onFinish, finishLabel }: QuizProps) {
+  const { t } = useT();
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
 
@@ -53,7 +55,7 @@ export function Quiz({ questions, onAnswer, onIndexChange, onFinish, finishLabel
     <>
       <div className="flex flex-1 flex-col gap-[18px]">
         <div className="font-mono text-xs tracking-[0.08em] text-lime uppercase">
-          Pergunta {index + 1} de {questions.length}
+          {t("quiz.question", { a: index + 1, b: questions.length })}
         </div>
         <h2 className="m-0 text-[28px] leading-[1.1] font-extrabold tracking-[-0.025em] text-balance">
           {question.question}
@@ -101,14 +103,14 @@ export function Quiz({ questions, onAnswer, onIndexChange, onFinish, finishLabel
         >
           <div className="flex flex-col gap-1">
             <div className={`text-xl font-extrabold ${correct ? "text-lime" : "text-coral"}`}>
-              {correct ? RIGHT_WORDS[index % RIGHT_WORDS.length] : "Ainda não."}
+              {correct ? t(RIGHT_WORDS[index % RIGHT_WORDS.length]) : t("quiz.wrong")}
             </div>
             <div className="text-[15px] leading-snug text-fg-2">
-              {correct ? question.explanation : `${question.explanation} Tenta outra vez.`}
+              {correct ? question.explanation : `${question.explanation} ${t("quiz.tryAgainHint")}`}
             </div>
           </div>
           <button type="button" className={`btn ${correct ? "btn-primary" : "btn-coral"}`} onClick={next}>
-            {!correct ? "Tentar de novo" : isLast ? finishLabel : "Continuar"}
+            {!correct ? t("quiz.retry") : isLast ? finishLabel : t("quiz.continue")}
           </button>
         </div>
       )}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { sortLeaderboard } from "../src/lib/skillchain/hooks";
+import { makeT } from "../src/i18n/translate";
 import { getRival } from "../src/lib/skillchain/rival";
 import type { Profile } from "../src/lib/skillchain/types";
 
@@ -30,6 +31,8 @@ describe("sortLeaderboard", () => {
   });
 });
 
+const t = makeT("en");
+
 describe("getRival", () => {
   const top = player("T".repeat(32), 3);
   const mid = player("M".repeat(32), 2);
@@ -37,24 +40,24 @@ describe("getRival", () => {
   const sorted = sortLeaderboard([top, mid, me]);
 
   it("proposes the next level to pass a higher-level player", () => {
-    const rival = getRival(sorted, me.owner);
-    expect(rival?.title).toContain("+150 pts");
+    const rival = getRival(sorted, me.owner, t);
+    expect(rival?.title).toContain("+150 pts to pass");
     expect(rival?.href).toBe("/learn/2");
   });
 
   it("reports a tie when the player ahead is on the same level", () => {
     const tied = sortLeaderboard([top, player("A".repeat(32), 1), me]);
-    const rival = getRival(tied, me.owner);
-    expect(rival?.title).toMatch(/^Empatado com/);
+    const rival = getRival(tied, me.owner, t);
+    expect(rival?.title).toMatch(/^Tied with/);
     expect(rival?.href).toBe("/leaderboard");
   });
 
   it("says first place when nobody is ahead", () => {
-    expect(getRival(sorted, top.owner)?.title).toBe("Estás em 1.º");
+    expect(getRival(sorted, top.owner, t)?.title).toBe("You're #1");
   });
 
   it("returns null without a profile", () => {
-    expect(getRival(sorted, "X".repeat(32))).toBeNull();
-    expect(getRival(sorted, null)).toBeNull();
+    expect(getRival(sorted, "X".repeat(32), t)).toBeNull();
+    expect(getRival(sorted, null, t)).toBeNull();
   });
 });

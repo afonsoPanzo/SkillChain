@@ -28,6 +28,10 @@ pnpm lint && pnpm build
 
 Requer Node 24 ou superior e a Phantom em modo Devnet. Enquanto `NEXT_PUBLIC_SKILLCHAIN_PROGRAM_ID` estiver vazio, a app usa dados simulados em memória (selo «Mock» no cabeçalho).
 
+## Idiomas
+
+Inglês por defeito e português como opção (botão EN/PT no cabeçalho). Dicionários em `src/i18n/` e lições em `src/content/lessons.en.json` e `lessons.pt.json`.
+
 ## Limitação conhecida
 
 O quiz é verificado só no front-end. A prova de cada nível é a tarefa on-chain.

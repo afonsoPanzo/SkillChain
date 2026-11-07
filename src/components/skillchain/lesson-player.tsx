@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useT } from "@/i18n/use-t";
 import type { Lesson } from "@/lib/skillchain/lessons";
 import type { TxState } from "@/lib/skillchain/types";
 import { Quiz } from "./quiz";
@@ -30,6 +31,7 @@ export function LessonPlayer({
   review = false,
   onExitReview,
 }: LessonPlayerProps) {
+  const { t } = useT();
   const [stage, setStage] = useState<Stage>("steps");
   const [step, setStep] = useState(0);
   const [quizIndex, setQuizIndex] = useState(0);
@@ -54,11 +56,11 @@ export function LessonPlayer({
           href="/learn"
           className="py-2 text-[15px] text-muted hover:text-fg hover:no-underline"
         >
-          ← Mapa
+          {t("common.map")}
         </Link>
         {review && (
           <div className="rounded-full border border-line px-[9px] py-[3px] font-mono text-xs text-muted">
-            Revisão
+            {t("lesson.review")}
           </div>
         )}
         {combo >= 2 && (
@@ -66,7 +68,7 @@ export function LessonPlayer({
             key={comboTick}
             className="animate-burst rounded-full bg-lime px-[9px] py-[3px] font-mono text-[13px] font-semibold text-ink"
           >
-            combo {combo}x
+            {t("lesson.combo", { n: combo })}
           </div>
         )}
       </div>
@@ -81,7 +83,7 @@ export function LessonPlayer({
         ))}
       </div>
       <div className="font-mono text-xs text-muted">
-        Nv {lesson.level} · {lesson.title}
+        {t("level.tag", { n: lesson.level, title: lesson.title })}
       </div>
     </div>
   );
@@ -94,7 +96,7 @@ export function LessonPlayer({
         {header}
         <div className="flex flex-1 flex-col gap-5">
           <div className="font-mono text-xs tracking-[0.08em] text-lime uppercase">
-            Passo {step + 1} de {nSteps}
+            {t("lesson.step", { a: step + 1, b: nSteps })}
           </div>
           <h2 className="m-0 text-[34px] leading-[1.05] font-extrabold tracking-[-0.03em] text-balance">
             {s.title}
@@ -103,7 +105,7 @@ export function LessonPlayer({
           {s.term && (
             <div className="flex flex-col gap-1.5 rounded-[14px] border border-line bg-surface px-4 py-3.5">
               <div className="text-xs font-bold tracking-[0.06em] text-violet uppercase">
-                Na prática
+                {t("lesson.practice")}
               </div>
               <div className="font-mono text-[13px] leading-[1.6] break-all whitespace-pre-line">
                 {s.term}
@@ -118,7 +120,7 @@ export function LessonPlayer({
               className="btn h-[58px] rounded-2xl border border-line bg-surface px-5 text-base font-bold text-fg shadow-[0_5px_0_var(--color-press)]"
               onClick={() => setStep(step - 1)}
             >
-              Voltar
+              {t("lesson.prev")}
             </button>
           )}
           <button
@@ -131,7 +133,7 @@ export function LessonPlayer({
               } else setStep(step + 1);
             }}
           >
-            {last ? "Começar o quiz" : "Seguinte"}
+            {last ? t("lesson.toQuiz") : t("lesson.next")}
           </button>
         </div>
       </>
@@ -147,7 +149,7 @@ export function LessonPlayer({
           onAnswer={onAnswer}
           onIndexChange={setQuizIndex}
           onFinish={() => (review ? onExitReview?.() : setStage("task"))}
-          finishLabel={review ? "Concluir revisão" : "Desbloquear tarefa"}
+          finishLabel={review ? t("quiz.finishReview") : t("quiz.unlockTask")}
         />
       </>
     );

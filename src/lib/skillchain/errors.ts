@@ -1,38 +1,29 @@
 /**
- * Maps program and wallet errors to Portuguese messages (SDD section 4.3).
+ * Maps program and wallet errors to translated messages (SDD section 4.3).
  * Anchor custom errors start at 6000, in declaration order.
  */
+import type { TFunction } from "../../i18n/translate";
 
+
+/** Program error names, in declaration order: code = 6000 + index. Messages live in src/i18n. */
 export const PROGRAM_ERRORS = [
-  { name: "WrongLevel", message: "O nível anterior ainda não foi concluído." },
-  {
-    name: "InvalidRecipient",
-    message: "O destinatário não pode ser a tua própria carteira.",
-  },
-  {
-    name: "MessageTooLong",
-    message: "A mensagem tem de ter entre 1 e 100 caracteres.",
-  },
-  { name: "UnknownItem", message: "Este item não existe." },
-  { name: "AlreadyOwned", message: "Já tens este item." },
-  {
-    name: "LevelTooLow",
-    message: "Precisas de um nível mais alto para este item.",
-  },
-  { name: "NotEnoughPoints", message: "Não tens pontos suficientes." },
-  { name: "NotOwned", message: "Ainda não tens este item." },
-  { name: "Unauthorized", message: "Este perfil não te pertence." },
-  { name: "InvalidSlot", message: "Espaço de equipamento inválido." },
-  { name: "Overflow", message: "Erro de cálculo de pontos." },
+  "WrongLevel",
+  "InvalidRecipient",
+  "MessageTooLong",
+  "UnknownItem",
+  "AlreadyOwned",
+  "LevelTooLow",
+  "NotEnoughPoints",
+  "NotOwned",
+  "Unauthorized",
+  "InvalidSlot",
+  "Overflow",
 ] as const;
 
-export type ProgramErrorName = (typeof PROGRAM_ERRORS)[number]["name"];
+export type ProgramErrorName = (typeof PROGRAM_ERRORS)[number];
 
 export const ANCHOR_ERROR_OFFSET = 6000;
 
-export const CANCELLED_MESSAGE = "Transacção cancelada.";
-export const GENERIC_MESSAGE =
-  "Não foi possível concluir a transacção. Tenta outra vez.";
 
 /** Thrown by the mock backend to mimic an on-chain error. */
 export class SkillChainProgramError extends Error {
@@ -83,33 +74,34 @@ export function describeTxError(err: unknown): string {
   );
 }
 
-export function toUserMessage(err: unknown): string {
+/** Turns any wallet, RPC or program error into a message for the player. */
+export function toUserMessage(err: unknown, t: TFunction): string {
   const text = messageChain(err);
 
   if (/user (?:rejected|declined|denied)|rejected (?:by|the)|request was rejected/i.test(text)) {
-    return CANCELLED_MESSAGE;
+    return t("error.cancelled");
   }
 
   const code = extractCustomCode(text);
   if (code !== null) {
-    const entry = PROGRAM_ERRORS[code - ANCHOR_ERROR_OFFSET];
-    if (entry) return entry.message;
+    const name = PROGRAM_ERRORS[code - ANCHOR_ERROR_OFFSET];
+    if (name) return t(`error.${name}`);
   }
 
-  for (const { name, message } of PROGRAM_ERRORS) {
-    if (new RegExp(`\\b${name}\\b`).test(text)) return message;
+  for (const name of PROGRAM_ERRORS) {
+    if (new RegExp(`\\b${name}\\b`).test(text)) return t(`error.${name}`);
   }
 
   if (/AccountOwnedByWrongProgram|owned by a different program/i.test(text)) {
-    return "O destinatário tem de ser uma carteira normal, não uma conta de programa.";
+    return t("error.wrongProgram");
   }
-  if (/already in use/i.test(text)) return "O teu perfil já existe.";
+  if (/already in use/i.test(text)) return t("error.alreadyInUse");
   if (/insufficient (?:funds|lamports)|attempt to debit an account/i.test(text)) {
-    return "Não tens SOL suficiente para esta transacção.";
+    return t("error.insufficientFunds");
   }
   if (/blockhash not found|block height exceeded|expired/i.test(text)) {
-    return "A transacção expirou. Tenta outra vez.";
+    return t("error.expired");
   }
 
-  return GENERIC_MESSAGE;
+  return t("error.generic");
 }

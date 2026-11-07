@@ -3,17 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter";
+import { useT } from "@/i18n/use-t";
 
 const TABS = [
-  { href: "/learn", label: "Aprender" },
-  { href: "/shop", label: "Loja" },
-  { href: "/profile", label: "Perfil" },
-  { href: "/leaderboard", label: "Ranking" },
+  { href: "/learn", label: "nav.learn" },
+  { href: "/shop", label: "nav.shop" },
+  { href: "/profile", label: "nav.profile" },
+  { href: "/leaderboard", label: "nav.leaderboard" },
 ] as const;
 
 export function BottomNav() {
   const pathname = usePathname();
   const { connected } = useWallet();
+  const { t } = useT();
 
   // Hidden while the player is inside a level, as in the design.
   const inLesson = /^\/learn\/\d+/.test(pathname);
@@ -21,7 +23,7 @@ export function BottomNav() {
 
   return (
     <nav
-      aria-label="Navegação principal"
+      aria-label={t("nav.aria")}
       className="sticky bottom-0 z-10 grid grid-cols-4 border-t border-divider bg-ink/95 backdrop-blur-[10px]"
     >
       {TABS.map((tab) => {
@@ -37,7 +39,7 @@ export function BottomNav() {
                 : "border-transparent text-muted hover:text-fg"
             }`}
           >
-            {tab.label}
+            {t(tab.label)}
           </Link>
         );
       })}

@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter";
+import { itemKey } from "@/i18n/translate";
+import { useT } from "@/i18n/use-t";
 import {
-  CATEGORY_LABEL,
   ITEMS,
   ITEM_CATEGORY,
   NONE,
@@ -39,34 +40,35 @@ function Stat({ label, children }: { label: string; children: React.ReactNode })
 export function ProfileScreen() {
   const { connected } = useWallet();
   const restoring = useWalletRestoring();
+  const { t } = useT();
   const { owner, profile, isLoading } = useProfile();
   const { note } = useNote();
   const sc = useSkillChain();
   const [busyId, setBusyId] = useState<number | null>(null);
 
-  if (restoring) return <p className="m-0 pt-6 text-[15px] text-muted">A ligar a carteira…</p>;
+  if (restoring) return <p className="m-0 pt-6 text-[15px] text-muted">{t("common.connecting")}</p>;
 
   if (!connected || !owner) {
     return (
       <div className="flex flex-col gap-4 pt-6">
-        <h2 className="m-0 text-[32px] font-extrabold tracking-[-0.03em]">Perfil</h2>
-        <p className="m-0 text-[15px] text-muted">Liga a carteira para ver o teu perfil.</p>
+        <h2 className="m-0 text-[32px] font-extrabold tracking-[-0.03em]">{t("nav.profile")}</h2>
+        <p className="m-0 text-[15px] text-muted">{t("profile.connectPrompt")}</p>
         <ConnectButton />
       </div>
     );
   }
 
-  if (isLoading) return <p className="m-0 pt-6 text-[15px] text-muted">A ler o teu perfil…</p>;
+  if (isLoading) return <p className="m-0 pt-6 text-[15px] text-muted">{t("common.loadingProfile")}</p>;
 
   if (!profile) {
     return (
       <div className="flex flex-col items-center gap-3.5 px-2 py-12 text-center">
-        <div className="text-2xl font-extrabold tracking-[-0.02em]">Ainda não tens perfil</div>
+        <div className="text-2xl font-extrabold tracking-[-0.02em]">{t("profile.none.title")}</div>
         <div className="text-base leading-normal text-muted">
-          O teu perfil é criado on-chain quando concluis o nível 1.
+          {t("profile.none.sub")}
         </div>
         <Link href="/learn/1" className="btn btn-primary px-6">
-          Começar o nível 1
+          {t("profile.startLevel1")}
         </Link>
       </div>
     );
@@ -90,32 +92,32 @@ export function ProfileScreen() {
         </div>
         {title && (
           <div className="rounded-full border-[1.5px] border-violet px-3 py-1 text-sm font-bold text-violet">
-            {title.name}
+            {t(itemKey(title.id))}
           </div>
         )}
         <div className="font-mono text-[13px] text-muted">{shortAddress(owner)}</div>
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        <Stat label="Nível">
+        <Stat label={t("profile.level")}>
           {profile.level}
           <span className="text-[15px] font-medium text-muted"> / {TOTAL_LEVELS}</span>
         </Stat>
-        <Stat label="Pontos">
+        <Stat label={t("profile.points")}>
           <span className="text-lime">{profile.points}</span>
         </Stat>
-        <Stat label="Total ganho">{profile.totalEarned}</Stat>
+        <Stat label={t("profile.totalEarned")}>{profile.totalEarned}</Stat>
       </div>
 
       <div className="flex flex-col gap-2.5">
         <div className="text-[13px] font-bold tracking-[0.06em] text-muted uppercase">
-          Inventário
+          {t("profile.inventory")}
         </div>
         {inventory.length === 0 ? (
           <div className="flex items-center justify-between gap-3 rounded-[14px] border border-dashed border-line bg-surface p-4">
-            <div className="text-[15px] text-muted">Ainda não tens itens.</div>
+            <div className="text-[15px] text-muted">{t("profile.noItems")}</div>
             <Link href="/shop" className="text-[15px] font-bold">
-              Ir à loja
+              {t("profile.goShop")}
             </Link>
           </div>
         ) : (
@@ -130,10 +132,10 @@ export function ProfileScreen() {
                 }`}
               >
                 <div className="flex flex-col gap-0.5">
-                  <div className="text-base font-bold">{item.name}</div>
+                  <div className="text-base font-bold">{t(itemKey(item.id))}</div>
                   <div className="text-[13px] text-muted">
-                    {CATEGORY_LABEL[item.category]}
-                    {equipped ? " · equipado" : ""}
+                    {t(`category.${item.category}`)}
+                    {equipped ? t("profile.equippedTag") : ""}
                   </div>
                 </div>
                 <button
@@ -148,11 +150,11 @@ export function ProfileScreen() {
                 >
                   {isBusy
                     ? sc.state.status === "confirming"
-                      ? "A confirmar…"
-                      : "A assinar…"
+                      ? t("task.confirming")
+                      : t("task.signing")
                     : equipped
-                      ? "Desequipar"
-                      : "Equipar"}
+                      ? t("profile.unequip")
+                      : t("profile.equip")}
                 </button>
               </div>
             );
@@ -165,7 +167,7 @@ export function ProfileScreen() {
       {note && (
         <div className="flex flex-col gap-2.5">
           <div className="text-[13px] font-bold tracking-[0.06em] text-muted uppercase">
-            Nota on-chain
+            {t("profile.note")}
           </div>
           <div className="flex flex-col gap-2 rounded-[14px] border border-line bg-surface p-4">
             <div className="text-[17px] leading-[1.45] break-words">“{note.message}”</div>

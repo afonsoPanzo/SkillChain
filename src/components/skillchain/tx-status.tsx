@@ -1,7 +1,8 @@
+import { useT } from "@/i18n/use-t";
 import { explorerTxUrl } from "@/lib/skillchain/format";
 import type { TxState } from "@/lib/skillchain/types";
 
-const STEPS = ["Assinar na carteira", "A confirmar na Devnet", "Confirmado"] as const;
+const STEPS = ["tx.sign", "tx.confirm", "tx.done"] as const;
 
 function stageOf(state: TxState): number {
   switch (state.status) {
@@ -18,6 +19,7 @@ function stageOf(state: TxState): number {
 
 /** Transaction progress: signing -> confirming -> confirmed, or an error. */
 export function TxStatus({ state }: { state: TxState }) {
+  const { t } = useT();
   if (state.status === "idle") return null;
   const stage = stageOf(state);
 
@@ -38,7 +40,7 @@ export function TxStatus({ state }: { state: TxState }) {
               }`}
             />
             <span className={`text-[15px] ${done || active ? "text-fg" : "text-muted"}`}>
-              {label}
+              {t(label)}
             </span>
           </div>
         );
@@ -50,7 +52,7 @@ export function TxStatus({ state }: { state: TxState }) {
           rel="noopener noreferrer"
           className="border-t border-line pt-3 text-[15px] font-bold"
         >
-          Ver no Solana Explorer ↗
+          {t("common.viewExplorer")}
         </a>
       )}
       {state.status === "error" && (

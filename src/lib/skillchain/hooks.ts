@@ -8,6 +8,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { useWallet } from "@solana/wallet-adapter";
+import { useT } from "../../i18n/use-t";
 import { backend } from "./backend";
 import { toUserMessage } from "./errors";
 import { getDataVersion, invalidateData, subscribeData } from "./store";
@@ -107,6 +108,7 @@ export function useLeaderboard() {
  */
 export function useSkillChain() {
   const { publicKey, sendTransaction } = useWallet();
+  const { t } = useT();
   const [state, setState] = useState<TxState>({ status: "idle" });
   const busyRef = useRef(false);
 
@@ -114,7 +116,7 @@ export function useSkillChain() {
     async (action: (ctx: TxContext) => Promise<string>) => {
       if (busyRef.current) return null;
       if (!publicKey) {
-        setState({ status: "error", message: "Liga primeiro a carteira." });
+        setState({ status: "error", message: t("error.connectFirst") });
         return null;
       }
       busyRef.current = true;
@@ -130,13 +132,13 @@ export function useSkillChain() {
         return signature;
       } catch (err) {
         console.error(err);
-        setState({ status: "error", message: toUserMessage(err) });
+        setState({ status: "error", message: toUserMessage(err, t) });
         return null;
       } finally {
         busyRef.current = false;
       }
     },
-    [publicKey, sendTransaction],
+    [publicKey, sendTransaction, t],
   );
 
   const reset = useCallback(() => setState({ status: "idle" }), []);
