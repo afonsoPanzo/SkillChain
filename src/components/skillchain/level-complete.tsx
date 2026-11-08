@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useT } from "@/i18n/use-t";
 import { useAccount } from "@/lib/skillchain/use-account";
 import { DemoExplorerNote } from "./demo-explorer-note";
+import { TutorCard } from "./tutor-card";
 import { TOTAL_LEVELS } from "@/lib/skillchain/constants";
 import { explorerTxUrl, shortAddress } from "@/lib/skillchain/format";
 
@@ -53,6 +54,8 @@ export function LevelComplete({ level, gain, signature, isMock }: LevelCompleteP
             </a>
           )}
         </div>
+
+        <TutorCard signature={signature} level={level} />
       </div>
       <Link href={href} className="btn btn-primary">
         {label}
