@@ -15,6 +15,11 @@ export async function deriveAddress(
   return address;
 }
 
+/** Program ID from the environment, or null while it is not configured. */
+export function getProgramId(): string | null {
+  return (process.env.NEXT_PUBLIC_SKILLCHAIN_PROGRAM_ID ?? "").trim() || null;
+}
+
 /**
  * Base58 address of an account PDA for the configured program, or null when
  * there is no Program ID (mock mode: the accounts do not exist on-chain).
@@ -23,7 +28,7 @@ export async function getAccountAddress(
   prefix: "profile" | "note",
   owner: string,
 ): Promise<string | null> {
-  const programId = (process.env.NEXT_PUBLIC_SKILLCHAIN_PROGRAM_ID ?? "").trim();
+  const programId = getProgramId();
   if (!programId) return null;
   return (await deriveAddress(new PublicKey(programId), prefix, new PublicKey(owner))).toBase58();
 }

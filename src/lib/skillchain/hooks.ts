@@ -55,26 +55,36 @@ function useQuery<T>(key: string | null, fetcher: () => Promise<T>) {
   };
 }
 
+/** Profile of any address, read without a wallet. `profile` is null if it does not exist. */
+export function useProfileOf(address: string | null) {
+  const fetcher = useCallback(
+    () => (address ? backend.getProfile(address) : Promise.resolve(null)),
+    [address],
+  );
+  const { data, isLoading, error } = useQuery<Profile | null>(address, fetcher);
+  return { profile: data, isLoading, error };
+}
+
+/** The level-3 note of any address, if it exists. */
+export function useNoteOf(address: string | null) {
+  const fetcher = useCallback(
+    () => (address ? backend.getNote(address) : Promise.resolve(null)),
+    [address],
+  );
+  const { data, isLoading } = useQuery<Note | null>(address, fetcher);
+  return { note: data, isLoading };
+}
+
 /** Profile of the connected wallet. `profile` is null if it does not exist yet (level 0). */
 export function useProfile() {
   const { owner } = useAccount();
-  const fetcher = useCallback(
-    () => (owner ? backend.getProfile(owner) : Promise.resolve(null)),
-    [owner],
-  );
-  const { data, isLoading, error } = useQuery<Profile | null>(owner, fetcher);
-  return { owner, profile: data, isLoading, error };
+  return { owner, ...useProfileOf(owner) };
 }
 
 /** The level-3 note of the connected wallet, if it exists. */
 export function useNote() {
   const { owner } = useAccount();
-  const fetcher = useCallback(
-    () => (owner ? backend.getNote(owner) : Promise.resolve(null)),
-    [owner],
-  );
-  const { data, isLoading } = useQuery<Note | null>(owner, fetcher);
-  return { note: data, isLoading };
+  return useNoteOf(owner);
 }
 
 /** Level desc, then total earned desc. */

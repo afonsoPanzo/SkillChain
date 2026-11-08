@@ -20,6 +20,7 @@ import type { Profile } from "@/lib/skillchain/types";
 import { useWalletRestoring } from "@/lib/skillchain/use-wallet-restoring";
 import { ProfileAvatar } from "./avatar";
 import { ConnectButton } from "./connect-button";
+import { ShareProfile } from "./share-profile";
 import { TxStatus } from "./tx-status";
 
 function equippedId(profile: Profile, item: ItemDef): number {
@@ -38,7 +39,7 @@ function Stat({ label, children }: { label: string; children: React.ReactNode })
 }
 
 export function ProfileScreen() {
-  const { connected } = useAccount();
+  const { connected, isDemo } = useAccount();
   const restoring = useWalletRestoring();
   const { t } = useT();
   const { owner, profile, isLoading } = useProfile();
@@ -163,6 +164,9 @@ export function ProfileScreen() {
       </div>
 
       <TxStatus state={sc.state} />
+
+      {/* A demo player does not exist on-chain, so there is nothing to share. */}
+      {!isDemo && <ShareProfile address={owner} level={profile.level} />}
 
       {note && (
         <div className="flex flex-col gap-2.5">
