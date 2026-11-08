@@ -6,6 +6,7 @@ import {
   buildInitProfileTransaction,
   langFromParam,
   refFromParam,
+  sanitizeName,
   type ChallengeChain,
 } from "./challenge";
 import { actionError, actionPreflight, actionResponse } from "./headers";
@@ -30,7 +31,8 @@ export function createChallengeHandlers({
       const url = new URL(request.url);
       const lang = langFromParam(url.searchParams.get("lang"));
       const ref = refFromParam(url.searchParams.get("ref"));
-      return actionResponse(buildChallengeMetadata(url.origin, lang, ref));
+      const name = sanitizeName(url.searchParams.get("name"));
+      return actionResponse(buildChallengeMetadata(url.origin, lang, ref, name));
     },
 
     OPTIONS(): Response {

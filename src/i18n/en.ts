@@ -104,6 +104,8 @@ export const en = {
   "blink.err.notConfigured": "SkillChain isn't available right now.",
   "blink.err.badRequest": "Invalid request.",
   "blink.err.rate": "Too many requests. Please wait a few minutes.",
+  "blink.nameLabel": "Your name in the challenge (optional)",
+  "blink.namePlaceholder": "Your name (optional)",
   "blink.challenge": "Challenge a friend",
   "blink.copied": "Link copied ✓",
   "blink.hint": "Share the link: apps that support Blinks show it as a card that creates the profile in one tap.",

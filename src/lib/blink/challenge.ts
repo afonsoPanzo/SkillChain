@@ -24,11 +24,43 @@ export function refFromParam(value: string | null): string | null {
   return value && isSolanaAddress(value) ? value : null;
 }
 
+export const MAX_NAME_LENGTH = 20;
+
+/**
+ * A display name typed into a link. It is plain text from the URL, so anyone
+ * can write anything: keep only letters, digits, spaces and a few marks
+ * (no dots or slashes, so a name cannot pass for a web address).
+ */
+export function sanitizeName(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const clean = value
+    .replace(/[^\p{L}\p{N} _'-]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, MAX_NAME_LENGTH)
+    .trim();
+  return clean || null;
+}
+
+/** Who challenges: "Maria (GSyT…1uY6)", or just the name or the short address. */
+export function challengerLabel(ref: string | null, name: string | null): string | null {
+  if (name && ref) return `${name} (${shortAddress(ref)})`;
+  if (name) return name;
+  return ref ? shortAddress(ref) : null;
+}
+
 /** Metadata shown by a Blink client (ActionGetResponse). */
-export function buildChallengeMetadata(origin: string, lang: Lang, ref: string | null) {
+export function buildChallengeMetadata(
+  origin: string,
+  lang: Lang,
+  ref: string | null,
+  name: string | null = null,
+) {
   const t = makeT(lang);
+  const who = challengerLabel(ref, name);
   const query = new URLSearchParams();
   if (ref) query.set("ref", ref);
+  if (name) query.set("name", name);
   if (lang !== DEFAULT_LANG) query.set("lang", lang);
   const queryString = query.toString();
   const href = queryString ? `${CHALLENGE_PATH}?${queryString}` : CHALLENGE_PATH;
@@ -37,9 +69,7 @@ export function buildChallengeMetadata(origin: string, lang: Lang, ref: string |
     type: "action" as const,
     icon: `${origin}/blink.svg`,
     title: t("blink.title"),
-    description: ref
-      ? t("blink.description.ref", { ref: shortAddress(ref) })
-      : t("blink.description"),
+    description: who ? t("blink.description.ref", { ref: who }) : t("blink.description"),
     label,
     links: { actions: [{ type: "transaction" as const, href, label }] },
   };

@@ -173,3 +173,37 @@ describe("OPTIONS and actions.json", () => {
     expect(actionsJsonOptions().headers.get("access-control-allow-origin")).toBe("*");
   });
 });
+
+describe("challenger display name", () => {
+  it("keeps plain names and cleans anything else", async () => {
+    const { sanitizeName } = await import("../src/lib/blink/challenge");
+    expect(sanitizeName("Maria")).toBe("Maria");
+    expect(sanitizeName("  João   Silva ")).toBe("João Silva");
+    expect(sanitizeName("<b>Hacker</b> https://evil.example")).toBe("bHackerb httpsevilex");
+    expect(sanitizeName("evil.com/login")).toBe("evilcomlogin");
+    expect(sanitizeName("a".repeat(50))).toBe("a".repeat(20));
+    expect(sanitizeName("🔥🔥")).toBeNull();
+    expect(sanitizeName("   ")).toBeNull();
+    expect(sanitizeName(null)).toBeNull();
+  });
+
+  it("shows the name with the short address in the Blink card", async () => {
+    const body = await (await get(handlers(), `?ref=${FRIEND}&name=Maria`)).json();
+    expect(body.description).toContain("Maria (BArA…G8k8) challenges you: reach level 3!");
+    expect(body.links.actions[0].href).toBe(`/api/actions/challenge?ref=${FRIEND}&name=Maria`);
+  });
+
+  it("works with a name and no address, and ignores a name that sanitizes to nothing", async () => {
+    const named = await (await get(handlers(), "?name=Maria")).json();
+    expect(named.description).toContain("Maria challenges you");
+    const empty = await (await get(handlers(), "?name=%F0%9F%94%A5")).json();
+    expect(empty.description).not.toContain("challenges you");
+    expect(empty.links.actions[0].href).toBe("/api/actions/challenge");
+  });
+
+  it("keeps the name when the card is in Portuguese", async () => {
+    const body = await (await get(handlers(), `?name=Maria&lang=pt`)).json();
+    expect(body.description).toContain("Maria desafia-te");
+    expect(body.links.actions[0].href).toBe("/api/actions/challenge?name=Maria&lang=pt");
+  });
+});
