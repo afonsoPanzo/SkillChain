@@ -16,21 +16,58 @@ type View =
 const ERROR_KEY: Record<string, TKey> = {
   rate_limited: "tutor.error.rate",
   transaction_not_found: "tutor.error.notFound",
+  not_skillchain: "tutor.error.notFound",
 };
 
-/** "Explain my transaction": an AI tutor (or a template) explains the player's real transaction. */
-export function TutorCard({ signature, level }: { signature: string; level: number }) {
+/**
+ * "Explain my transaction": an AI tutor (or a template) explains the player's real transaction.
+ * Pass `signature` right after completing a level. For a level finished earlier, pass `owner`
+ * and the transaction is looked up on Devnet first.
+ */
+export function TutorCard({
+  signature: knownSignature,
+  owner,
+  level,
+}: {
+  signature?: string;
+  owner?: string;
+  level: number;
+}) {
   const { t, lang } = useT();
   const { isDemo } = useAccount();
   const [view, setView] = useState<View>({ status: "idle" });
+  const [found, setFound] = useState<string | null>(null);
+  const signature = knownSignature ?? found ?? "";
+
+  async function findSignature(): Promise<string | null> {
+    const response = await fetch("/api/tutor/find", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ owner, level }),
+    });
+    const data = (await response.json()) as { signature?: string; error?: string };
+    if (!response.ok || !data.signature) {
+      setView({ status: "error", message: ERROR_KEY[data.error ?? ""] ?? "tutor.error.generic" });
+      return null;
+    }
+    setFound(data.signature);
+    return data.signature;
+  }
 
   async function explain() {
     setView({ status: "loading" });
     try {
+      const target = knownSignature ?? found ?? (owner ? await findSignature() : null);
+      if (!target) {
+        setView((current) =>
+          current.status === "loading" ? { status: "error", message: "tutor.error.generic" } : current,
+        );
+        return;
+      }
       const response = await fetch("/api/tutor", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ signature, level, lang }),
+        body: JSON.stringify({ signature: target, level, lang }),
       });
       const data = (await response.json()) as { text?: string; source?: "ai" | "template"; error?: string };
       if (!response.ok || !data.text || !data.source) {

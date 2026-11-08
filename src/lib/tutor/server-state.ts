@@ -15,6 +15,8 @@ interface TutorState {
   facts: TtlCache<TxFacts>;
   explanations: TtlCache<Explanation>;
   questionCounts: TtlCache<number>;
+  /** "owner:level" -> signature of the transaction that completed the level. */
+  signatures: TtlCache<string>;
   ask?: AskAi | null;
   chat?: AskChat | null;
 }
@@ -26,6 +28,7 @@ export const tutorState: TutorState = (holder.__skillchainTutor ??= {
   facts: new TtlCache<TxFacts>(),
   explanations: new TtlCache<Explanation>(),
   questionCounts: new TtlCache<number>(),
+  signatures: new TtlCache<string>(),
 });
 
 export const FACTS_CACHE_MS = 60 * 60_000;

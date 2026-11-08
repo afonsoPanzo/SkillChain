@@ -42,6 +42,8 @@ Depois de concluir um nível, "Explain my transaction" chama `POST /api/tutor`. 
 
 Depois da explicação há um chat de seguimento (`POST /api/tutor/ask`): 3 perguntas por transacção (contadas no cliente e no servidor), 300 caracteres cada, no máximo 2 trocas anteriores como contexto, com os factos da transacção e o texto da lição. Se a IA falhar, aparece "The tutor is unavailable right now" e as perguntas sugeridas respondem com texto pré-escrito. No modo demo as sugeridas têm respostas fixas e o campo livre fica desactivado.
 
+Nos níveis já concluídos (sem assinatura à mão), `POST /api/tutor/find` procura na Devnet a transacção que completou o nível, a partir da conta do perfil (níveis 1 e 2) ou da nota (nível 3), e só devolve uma que o programa SkillChain reconheça e que tenha sido assinada pelo jogador.
+
 ## Limitação conhecida
 
 O quiz é verificado só no front-end. A prova de cada nível é a tarefa on-chain.
