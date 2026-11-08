@@ -8,7 +8,7 @@ MLH Solana Hackathon · 2026 · Network: **Solana Devnet only** (no real money i
 
 - **Live app:** https://skill-chain-lyart.vercel.app
 - **Pitch deck:** [`docs/SkillChain-Pitch-Deck.pdf`](docs/SkillChain-Pitch-Deck.pdf)
-- **Demo video:** _add YouTube link_
+- **Demo video:** https://youtu.be/Yvnggdeu_qw
 
 ![SkillChain](docs/cover.png)
 
