@@ -19,11 +19,20 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
+const DESCRIPTION = "Learn Solana by playing. Every level ends with a real transaction on Devnet.";
+
+// Absolute base for Open Graph URLs: explicit setting, else the Vercel deployment, else local.
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "SkillChain",
-  description:
-    "Learn Solana by playing. Every level ends with a real transaction on Devnet.",
+  description: DESCRIPTION,
   icons: { icon: "/icon.svg" },
+  openGraph: { title: "SkillChain", description: DESCRIPTION, siteName: "SkillChain", type: "website" },
+  twitter: { card: "summary_large_image", title: "SkillChain", description: DESCRIPTION },
 };
 
 export const viewport: Viewport = {

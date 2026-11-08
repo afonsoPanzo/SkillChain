@@ -1,6 +1,7 @@
 "use client";
 
 import { useAccount } from "@/lib/skillchain/use-account";
+import Link from "next/link";
 import { itemKey } from "@/i18n/translate";
 import { useT } from "@/i18n/use-t";
 import { shortAddress } from "@/lib/skillchain/format";
@@ -18,9 +19,10 @@ function Row({ profile, position, me }: { profile: Profile; position: number; me
   const { t } = useT();
   const hasTitle = profile.equippedTitle === TITLE_ITEM;
   return (
-    <div
-      className={`grid grid-cols-[28px_40px_minmax(0,1fr)_auto] items-center gap-3 rounded-[14px] border py-2.5 pr-3.5 pl-2.5 ${
-        me ? "border-lime bg-lime/7" : "border-line bg-surface"
+    <Link
+      href={`/u/${profile.owner}`}
+      className={`grid grid-cols-[28px_40px_minmax(0,1fr)_auto] items-center gap-3 rounded-[14px] border py-2.5 pr-3.5 pl-2.5 text-fg hover:no-underline ${
+        me ? "border-lime bg-lime/7" : "border-line bg-surface hover:border-lime"
       }`}
     >
       <div
@@ -43,7 +45,7 @@ function Row({ profile, position, me }: { profile: Profile; position: number; me
         <div className="text-[15px] font-bold">{t("board.level", { n: profile.level })}</div>
         <div className="font-mono text-xs text-muted">{t("board.pts", { n: profile.totalEarned })}</div>
       </div>
-    </div>
+    </Link>
   );
 }
 

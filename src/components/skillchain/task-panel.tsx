@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { PublicKey } from "@solana/web3.js";
 import { useT } from "@/i18n/use-t";
 import {
   BASE_FEE_LAMPORTS,
@@ -12,26 +11,15 @@ import {
 } from "@/lib/skillchain/constants";
 import { formatSol, shortAddress } from "@/lib/skillchain/format";
 import type { Lesson } from "@/lib/skillchain/lessons";
+import { isSolanaAddress } from "@/lib/skillchain/address";
 import { DEMO_LAMPORTS } from "@/lib/skillchain/demo";
 import { useAccount } from "@/lib/skillchain/use-account";
 import { useBalance } from "@/lib/skillchain/use-balance";
 import type { TxState } from "@/lib/skillchain/types";
 import { TxStatus } from "./tx-status";
 
-/** A Solana address: base58, 32 bytes. */
-const BASE58 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
-
 /** Fresh account (note PDA, about 153 bytes) rent plus fee, rounded up. */
 const LEVEL_3_MIN_LAMPORTS = 3_000_000n;
-
-function isSolanaAddress(value: string): boolean {
-  if (!BASE58.test(value)) return false;
-  try {
-    return new PublicKey(value).toBytes().length === 32;
-  } catch {
-    return false;
-  }
-}
 
 interface TaskPanelProps {
   lesson: Lesson;
