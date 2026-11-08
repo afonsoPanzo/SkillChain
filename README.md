@@ -2,9 +2,25 @@
 
 **SkillChain teaches Solana by playing: three short levels, each one ending with a real transaction on Devnet that proves you did it.**
 
-**Live app:** https://skill-chain-lyart.vercel.app
+**Learn Solana by doing.** Every level is a real on-chain transaction, explained by an AI tutor.
 
-Built for the Solana Hackathon (MLH), 6 to 8 November 2026. Network: **Solana Devnet only**. No real money is ever involved.
+MLH Solana Hackathon · 2026 · Network: **Solana Devnet only** (no real money is ever involved)
+
+- **Live app:** https://skill-chain-lyart.vercel.app
+- **Pitch deck:** [`docs/SkillChain-Pitch-Deck.pdf`](docs/SkillChain-Pitch-Deck.pdf)
+- **Demo video:** _add YouTube link_
+
+![SkillChain](docs/cover.png)
+
+## The problem
+
+Blockchain is learned by reading. It should be learned by doing.
+
+- **Jargon first:** wallets, keys, lamports and PDAs arrive as words, not experiences.
+- **No real practice:** tutorials explain transactions. Beginners rarely send one.
+- **Nothing to show:** course progress lives on someone else's server.
+
+SkillChain turns each concept into a short lesson, a quiz and a real transaction, with a proof anyone can check on Solana Explorer.
 
 ## Program ID (Devnet)
 
@@ -32,6 +48,14 @@ Built for the Solana Hackathon (MLH), 6 to 8 November 2026. Network: **Solana De
 - **Blink** – the challenge is also a Solana Action ("Blink"): a card that lets a friend create their profile (level 1) from any Blink-aware client, without opening the site. It uses the same text as the challenge page and, after accepting, links to it.
 - **Demo mode** – "Try without a wallet" lets anyone try the whole app with a simulated player and leaderboard. A banner makes clear that nothing is on-chain, and connecting a real wallet leaves demo mode.
 - **English and Portuguese** – English by default, with an EN/PT switch in the header. Numbers follow the language (0.5 SOL / 0,5 SOL).
+
+## Why Solana
+
+The chain is the referee. There is no backend database and no admin key.
+
+- **Proof:** every level is a transaction anyone can check.
+- **Ownership:** progress, points and items live in the player's own PDAs, not on our server. Points are earned, never bought or transferred.
+- **Speed and cost:** fast confirmations and tiny fees make learning by doing practical.
 
 ## Architecture
 
@@ -156,11 +180,19 @@ Names only; see [`.env.example`](.env.example). Set them in `.env` locally and i
 - **Wallet buttons and modals** come from the Wallet Adapter library and stay in English.
 - **Only the Phantom wallet was tested** for the full flow.
 
+## What's next
+
+- More paths: tokens, NFTs, DeFi basics
+- Non-transferable on-chain certificates
+- Seasons and tournaments
+- Classroom mode for universities and bootcamps
+
 ## Documentation
 
 - [`SDD.md`](SDD.md): full specification, the source of truth (Portuguese).
 - [`FUNCIONALIDADES.md`](FUNCIONALIDADES.md): detailed description of every added feature (Portuguese).
 - [`PROGRESSO.md`](PROGRESSO.md): record of the first phases and decisions (Portuguese).
+- [`docs/SkillChain-Pitch-Deck.pdf`](docs/SkillChain-Pitch-Deck.pdf): the pitch deck.
 - [`design/`](design/): visual prototype and screenshots.
 
 ## License
