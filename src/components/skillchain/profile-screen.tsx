@@ -20,6 +20,7 @@ import type { Profile } from "@/lib/skillchain/types";
 import { useWalletRestoring } from "@/lib/skillchain/use-wallet-restoring";
 import { ProfileAvatar } from "./avatar";
 import { ConnectButton } from "./connect-button";
+import { ChallengeButton } from "./challenge-button";
 import { ShareProfile } from "./share-profile";
 import { TxStatus } from "./tx-status";
 
@@ -167,6 +168,7 @@ export function ProfileScreen() {
 
       {/* A demo player does not exist on-chain, so there is nothing to share. */}
       {!isDemo && <ShareProfile address={owner} level={profile.level} />}
+      <ChallengeButton address={owner} />
 
       {note && (
         <div className="flex flex-col gap-2.5">

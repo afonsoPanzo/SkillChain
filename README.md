@@ -44,6 +44,10 @@ Depois da explicação há um chat de seguimento (`POST /api/tutor/ask`): 3 perg
 
 Nos níveis já concluídos (sem assinatura à mão), `POST /api/tutor/find` procura na Devnet a transacção que completou o nível, a partir da conta do perfil (níveis 1 e 2) ou da nota (nível 3), e só devolve uma que o programa SkillChain reconheça e que tenha sido assinada pelo jogador.
 
+## Blink "Challenge a friend"
+
+`/api/actions/challenge` é uma Solana Action (spec 2.x, Devnet, `X-Blockchain-Ids: solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1`): o GET devolve o cartão, o POST devolve a transacção `init_profile` sem assinar (fee payer = conta, blockhash recente) ou um erro amigável se a conta já tem perfil. `/actions.json` mapeia `/challenge` para a action. O link a partilhar é `/challenge?ref=<endereço>` (`&lang=pt` para português); quem não tem cliente com Blinks vê a página `/challenge`. Os botões "Challenge a friend" estão em `/profile` e `/u/[address]`.
+
 ## Limitação conhecida
 
 O quiz é verificado só no front-end. A prova de cada nível é a tarefa on-chain.
