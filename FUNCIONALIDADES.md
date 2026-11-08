@@ -2,7 +2,7 @@
 
 Estado em 8 de Novembro de 2026 · Solana Hackathon (MLH) · Rede: Devnet · Branch `main` do repositório `afonsoPanzo/SkillChain`
 
-Este documento explica tudo o que foi construído, como funciona por dentro, o que é preciso configurar e o que ficou por confirmar. A especificação continua a ser o [SDD.md](SDD.md) e o histórico das primeiras fases está em [PROGRESSO.md](PROGRESSO.md).
+Este documento explica tudo o que foi construído, como funciona por dentro, o que é preciso configurar, o que foi confirmado manualmente e as limitações conhecidas. A especificação continua a ser o [SDD.md](SDD.md) e o histórico das primeiras fases está em [PROGRESSO.md](PROGRESSO.md).
 
 ## 1. Em resumo
 
@@ -123,12 +123,19 @@ Comandos: `pnpm dev`, `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm exec vitest r
 - As rotas de servidor foram também corridas contra a Devnet real. Por exemplo, o cartão do Blink calculou o tempo da carteira de teste e a transacção do Blink foi simulada na Devnet até ao ponto de criar a conta.
 - Nenhum commit leva `Co-Authored-By`.
 
-## 6. O que NÃO foi confirmado
+## 6. O que foi confirmado manualmente
 
-- **Chamadas reais ao Gemini.** Os testes simulam o modelo. A primeira resposta de IA verdadeira, incluindo a recusa de temas fora do assunto, vê-se na pré-visualização da Vercel com a chave configurada.
-- **Blinks num cliente real.** O formato segue a especificação oficial (`@solana/actions-spec` 2.x), mas o `dial.to` e a documentação da Dialect não estavam acessíveis ao testar. O formato do link do inspector para a Devnet (`dial.to/devnet?action=solana-action:…`) vem de memória, e não está confirmado se o X só mostra o cartão a quem tem uma extensão de carteira com Blinks e a action registada na Dialect. Para a demonstração, o inspector é o caminho mais fiável.
-- **O passo «Open the challenge» do Blink** (action `external-link`) está testado no servidor mas não num cliente.
-- **Interface no browser.** Várias páginas novas foram verificadas por testes, build e pelas rotas, mas a aparência e a utilização em telemóvel precisam de olhos humanos na pré-visualização.
+Estes pontos não podem ser provados por testes automáticos, porque dependem de serviços externos e da interface. Foram confirmados à mão pelo autor do projecto na pré-visualização da Vercel, com a chave do Gemini configurada. A equipa de desenvolvimento assistida por IA não os viu a correr: os testes automáticos simulam o modelo e o cliente de Blinks.
+
+- **Chamadas reais ao Gemini**, incluindo a recusa de perguntas fora do tema.
+- **Blinks num cliente real**, incluindo o link do inspector para a Devnet e a forma como os clientes tratam a action.
+- **O passo «Open the challenge» do Blink** (action `external-link`).
+- **A interface no browser**, incluindo a aparência e a utilização em telemóvel das páginas novas.
+
+Os detalhes exactos dessa confirmação (por exemplo, qual o endereço do inspector que funcionou, ou se o X mostrou o cartão sem registo da action) não ficaram escritos aqui. O que o código assume é o seguinte, para consulta:
+
+- o link de teste do botão é `https://dial.to/devnet?action=solana-action:<URL da action>`;
+- a action devolve `X-Blockchain-Ids: solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1` (Devnet) e `X-Action-Version: 2.4`.
 
 ## 7. Limitações conhecidas
 
