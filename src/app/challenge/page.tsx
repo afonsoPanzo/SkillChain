@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { ChallengeLanding } from "@/components/skillchain/challenge-landing";
 import { challengerLabel, refFromParam, sanitizeName } from "@/lib/blink/challenge";
 
@@ -9,25 +10,25 @@ const first = (value: string | string[] | undefined) =>
 
 const TITLE = "SkillChain — Learn Solana by playing";
 const DESCRIPTION =
-  "You've been challenged: reach level 3 on SkillChain. Every level ends with a real transaction on Solana Devnet.";
+  "You've been challenged: finish all 3 SkillChain levels. Every level ends with a real transaction on Solana Devnet.";
 
-export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  const { ref, name } = await searchParams;
-  const who = challengerLabel(refFromParam(first(ref)), sanitizeName(first(name)));
-  const description = who
-    ? `${who} challenges you: reach level 3 on SkillChain. Every level ends with a real transaction on Solana Devnet.`
-    : DESCRIPTION;
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: TITLE,
-    description,
-    openGraph: { title: TITLE, description, type: "website" },
-    twitter: { card: "summary_large_image", title: TITLE, description },
+    description: DESCRIPTION,
+    openGraph: { title: TITLE, description: DESCRIPTION, type: "website" },
+    twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
   };
 }
 
 export default async function ChallengePage({ searchParams }: Props) {
   const { ref, name } = await searchParams;
   const challenger = refFromParam(first(ref));
-  const label = challengerLabel(challenger, sanitizeName(first(name)));
-  return <ChallengeLanding challenger={challenger} label={label} />;
+  const cleanName = sanitizeName(first(name));
+
+  // Earlier shared links used /challenge?ref=<address>: send them to the new page.
+  if (challenger) {
+    redirect(`/challenge/${challenger}${cleanName ? `?name=${encodeURIComponent(cleanName)}` : ""}`);
+  }
+  return <ChallengeLanding challenger={null} label={challengerLabel(null, cleanName)} />;
 }

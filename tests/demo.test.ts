@@ -17,6 +17,7 @@ function fakeBackend(isMock: boolean): SkillChainBackend {
     getProfile: vi.fn().mockResolvedValue(null),
     getNote: vi.fn().mockResolvedValue(null),
     listProfiles: vi.fn().mockResolvedValue([]),
+    getRunInfo: vi.fn().mockResolvedValue(null),
     initProfile: vi.fn().mockResolvedValue("sig"),
     completeLevel2: vi.fn().mockResolvedValue("sig"),
     completeLevel3: vi.fn().mockResolvedValue("sig"),

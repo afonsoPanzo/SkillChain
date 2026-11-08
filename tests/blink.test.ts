@@ -65,7 +65,7 @@ describe("GET /api/actions/challenge", () => {
   it("shows who challenges you when ?ref is a valid address", async () => {
     const body = await (await get(handlers(), `?ref=${FRIEND}`)).json();
     expect(body.description).toContain("BArA…G8k8 challenges you: reach level 3!");
-    expect(body.links.actions[0].href).toBe(`/api/actions/challenge?ref=${FRIEND}`);
+    expect(body.links.actions[0].href).toBe(`/api/actions/challenge/${FRIEND}`);
   });
 
   it("ignores an invalid ?ref", async () => {
@@ -167,8 +167,8 @@ describe("OPTIONS and actions.json", () => {
     expectActionHeaders(response);
     const body = await response.json();
     expect(body.rules).toContainEqual({
-      pathPattern: "/challenge",
-      apiPath: "/api/actions/challenge",
+      pathPattern: "/challenge/*",
+      apiPath: "/api/actions/challenge/*",
     });
     expect(actionsJsonOptions().headers.get("access-control-allow-origin")).toBe("*");
   });
@@ -190,7 +190,7 @@ describe("challenger display name", () => {
   it("shows the name with the short address in the Blink card", async () => {
     const body = await (await get(handlers(), `?ref=${FRIEND}&name=Maria`)).json();
     expect(body.description).toContain("Maria (BArA…G8k8) challenges you: reach level 3!");
-    expect(body.links.actions[0].href).toBe(`/api/actions/challenge?ref=${FRIEND}&name=Maria`);
+    expect(body.links.actions[0].href).toBe(`/api/actions/challenge/${FRIEND}?name=Maria`);
   });
 
   it("works with a name and no address, and ignores a name that sanitizes to nothing", async () => {
@@ -205,5 +205,81 @@ describe("challenger display name", () => {
     const body = await (await get(handlers(), `?name=Maria&lang=pt`)).json();
     expect(body.description).toContain("Maria desafia-te");
     expect(body.links.actions[0].href).toBe("/api/actions/challenge?name=Maria&lang=pt");
+  });
+});
+
+describe("speedrun challenge in the Blink", () => {
+  function withRun(run: { status: "none" | "running" | "finished"; level: number; durationSeconds: number | null } | Error) {
+    const chain: ChallengeChain = {
+      hasProfile: vi.fn().mockResolvedValue(false),
+      latestBlockhash: vi.fn().mockResolvedValue(BLOCKHASH),
+    };
+    return createChallengeHandlers({
+      chain,
+      programId: () => PROGRAM,
+      limiter: new RateLimiter(100),
+      describeRun: async () => {
+        if (run instanceof Error) throw run;
+        return run;
+      },
+    });
+  }
+  const request = (path = "") => new Request(`${ORIGIN}/api/actions/challenge${path}`);
+
+  it("uses the same sentence as the challenge page, with the time", async () => {
+    const h = withRun({ status: "finished", level: 3, durationSeconds: 402 });
+    const body = await (await h.GET(request(`/${FRIEND}?name=Maria`), FRIEND)).json();
+    expect(body.description).toBe("Maria (BArA…G8k8) finished SkillChain in 6m 42s — can you beat it?");
+    expect(body.links.actions[0].href).toBe(`/api/actions/challenge/${FRIEND}?name=Maria`);
+  });
+
+  it("says where a challenger who is still running is, in both languages", async () => {
+    const h = withRun({ status: "running", level: 2, durationSeconds: null });
+    expect((await (await h.GET(request(), FRIEND)).json()).description).toContain("is on level 2");
+    const pt = await (await h.GET(request("?lang=pt"), FRIEND)).json();
+    expect(pt.description).toContain("está no nível 2");
+  });
+
+  it("falls back to the generic text when the run cannot be read", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const h = withRun(new Error("rpc down"));
+    const response = await h.GET(request(), FRIEND);
+    expect(response.status).toBe(200);
+    expect((await response.json()).description).toContain("challenges you: reach level 3!");
+  });
+
+  it("the POST chains a next step that opens the challenge page", async () => {
+    const h = withRun({ status: "none", level: 0, durationSeconds: null });
+    const response = await h.POST(
+      new Request(`${ORIGIN}/api/actions/challenge/${FRIEND}`, {
+        method: "POST",
+        body: JSON.stringify({ account: PLAYER }),
+      }),
+      FRIEND,
+    );
+    const body = await response.json();
+    const next = body.links.next;
+    expect(next.type).toBe("inline");
+    expect(next.action.type).toBe("action");
+    expect(next.action.icon).toBe(`${ORIGIN}/blink.svg`);
+    expect(next.action.links.actions).toEqual([
+      {
+        type: "external-link",
+        href: `/api/actions/challenge/open?ref=${FRIEND}`,
+        label: "Open the challenge",
+      },
+    ]);
+  });
+
+  it("the external-link step returns the challenge page on the site", async () => {
+    const h = withRun({ status: "none", level: 0, durationSeconds: null });
+    const response = await h.OPEN(request(`/open?ref=${FRIEND}`));
+    expectActionHeaders(response);
+    expect(await response.json()).toEqual({
+      type: "external-link",
+      externalLink: `${ORIGIN}/challenge/${FRIEND}`,
+    });
+    const pt = await (await h.OPEN(request(`/open?ref=${FRIEND}&lang=pt`))).json();
+    expect(pt.externalLink).toBe(`${ORIGIN}/challenge/${FRIEND}?lang=pt`);
   });
 });

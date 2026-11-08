@@ -13,7 +13,7 @@ import {
 } from "./constants";
 import { isDemoActive } from "./demo-flag";
 import { SkillChainProgramError } from "./errors";
-import type { Note, Profile, SkillChainBackend, TxContext } from "./types";
+import type { Note, Profile, RunInfo, SkillChainBackend, TxContext } from "./types";
 
 const SIGNING_MS = 900;
 const CONFIRMING_MS = 1200;
@@ -61,14 +61,57 @@ function seedProfiles(): Profile[] {
   ];
 }
 
+/** Simulated speedrun: when each seeded player started, and how long the finishers took. */
+const SEED_START = 1_760_000_000;
+const SEED_DURATIONS: Record<number, number> = { 0: 402, 1: 551, 2: 895 };
+
+function fakeSignature(index: number): string {
+  // 88 base58 characters, stable per player so the demo looks the same on every visit.
+  return BASE58[index % BASE58.length].repeat(88);
+}
+
+function seedRuns(): { runs: [string, RunInfo][]; notes: Note[] } {
+  const runs: [string, RunInfo][] = [];
+  const seededNotes: Note[] = [];
+  seedProfiles().forEach((profile, i) => {
+    const startTime = SEED_START + i * 3600;
+    const duration = SEED_DURATIONS[i];
+    runs.push([
+      profile.owner,
+      {
+        startTime,
+        startSignature: fakeSignature(i),
+        endSignature: duration === undefined ? null : fakeSignature(i + 20),
+      },
+    ]);
+    if (duration !== undefined) {
+      seededNotes.push({
+        owner: profile.owner,
+        message: "Learning Solana one level at a time",
+        createdAt: startTime + duration,
+      });
+    }
+  });
+  return { runs, notes: seededNotes };
+}
+
 const profiles = new Map<string, Profile>();
 const notes = new Map<string, Note>();
+const runs = new Map<string, RunInfo>();
 
-/** Restores the seeded ranking and forgets every player and note. */
-export function resetMockState() {
+function seedAll() {
   profiles.clear();
   notes.clear();
+  runs.clear();
   for (const p of seedProfiles()) profiles.set(p.owner, p);
+  const seeded = seedRuns();
+  for (const [owner, info] of seeded.runs) runs.set(owner, info);
+  for (const n of seeded.notes) notes.set(n.owner, n);
+}
+
+/** Restores the seeded ranking and forgets every player, note and run. */
+export function resetMockState() {
+  seedAll();
   clearPersisted();
 }
 
@@ -80,7 +123,11 @@ function persist() {
   try {
     sessionStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ profiles: [...profiles.values()], notes: [...notes.values()] }),
+      JSON.stringify({
+        profiles: [...profiles.values()],
+        notes: [...notes.values()],
+        runs: [...runs.entries()],
+      }),
     );
   } catch {
     // Blocked storage: progress just lasts until the next reload.
@@ -99,18 +146,24 @@ function restorePersisted(): boolean {
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return false;
-    const data = JSON.parse(raw) as { profiles: Profile[]; notes: Note[] };
+    const data = JSON.parse(raw) as {
+      profiles: Profile[];
+      notes: Note[];
+      runs?: [string, RunInfo][];
+    };
     profiles.clear();
     notes.clear();
+    runs.clear();
     for (const p of data.profiles) profiles.set(p.owner, p);
     for (const n of data.notes) notes.set(n.owner, n);
+    for (const [owner, info] of data.runs ?? []) runs.set(owner, info);
     return true;
   } catch {
     return false;
   }
 }
 
-for (const p of seedProfiles()) profiles.set(p.owner, p);
+seedAll();
 if (isDemoActive()) restorePersisted();
 
 function requireProfile(owner: string): Profile {
@@ -151,9 +204,21 @@ export const mockBackend: SkillChainBackend = {
     return Array.from(profiles.values(), (p) => ({ ...p }));
   },
 
+  async getRunInfo(owner, includeEnd = true) {
+    await wait(READ_MS);
+    const run = runs.get(owner);
+    if (!run) return null;
+    return { ...run, endSignature: includeEnd ? run.endSignature : null };
+  },
+
   async initProfile(ctx) {
     if (profiles.has(ctx.owner)) throw new Error("account already in use");
     const signature = await send(ctx);
+    runs.set(ctx.owner, {
+      startTime: Math.floor(Date.now() / 1000),
+      startSignature: signature,
+      endSignature: null,
+    });
     save({
       owner: ctx.owner,
       level: 1,
@@ -194,6 +259,8 @@ export const mockBackend: SkillChainBackend = {
       message,
       createdAt: Math.floor(Date.now() / 1000),
     });
+    const run = runs.get(ctx.owner);
+    if (run) runs.set(ctx.owner, { ...run, endSignature: signature });
     save({
       ...profile,
       level: 3,
