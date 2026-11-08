@@ -5,6 +5,7 @@ import { useT } from "@/i18n/use-t";
 import type { TKey } from "@/i18n/translate";
 import { explorerTxUrl } from "@/lib/skillchain/format";
 import { useAccount } from "@/lib/skillchain/use-account";
+import { TutorChat } from "./tutor-chat";
 
 type View =
   | { status: "idle" }
@@ -48,17 +49,21 @@ export function TutorCard({ signature, level }: { signature: string; level: numb
   // Demo mode never calls the server: the example text is fixed.
   if (isDemo) {
     return (
-      <Card label={t("tutor.label.demo")}>
-        <p className="m-0 text-[15px] leading-normal text-fg-3">
-          {t(`tutor.demo.${Math.min(Math.max(level, 1), 3)}` as TKey)}
-        </p>
-        <p className="m-0 text-[13px] leading-snug text-coral-t">{t("tutor.demo.note")}</p>
-      </Card>
+      <>
+        <Card label={t("tutor.label.demo")}>
+          <p className="m-0 text-[15px] leading-normal text-fg-3">
+            {t(`tutor.demo.${Math.min(Math.max(level, 1), 3)}` as TKey)}
+          </p>
+          <p className="m-0 text-[13px] leading-snug text-coral-t">{t("tutor.demo.note")}</p>
+        </Card>
+        <TutorChat signature={signature} level={level} demo />
+      </>
     );
   }
 
   if (view.status === "done") {
     return (
+      <>
       <Card label={view.source === "ai" ? t("tutor.label.ai") : t("tutor.label.template")}>
         <p className="m-0 text-[15px] leading-normal text-fg-3">{view.text}</p>
         {view.source === "template" && (
@@ -73,6 +78,8 @@ export function TutorCard({ signature, level }: { signature: string; level: numb
           {t("common.viewExplorer")}
         </a>
       </Card>
+      <TutorChat signature={signature} level={level} demo={false} />
+      </>
     );
   }
 

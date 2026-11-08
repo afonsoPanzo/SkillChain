@@ -40,6 +40,8 @@ Na landing, "Try without a wallet" / "Experimentar sem carteira" abre a app inte
 
 Depois de concluir um nível, "Explain my transaction" chama `POST /api/tutor`. O servidor lê a transacção da Devnet, extrai só factos (taxa, contas e papéis, variações de saldo, instrução identificada pelo discriminator do IDL, evento `LevelCompleted`) e pede ao Gemini (`@google/genai`, modelo por defeito `gemini-3.5-flash-lite`) uma explicação de 4 a 6 frases. Se a IA falhar, demorar mais de 10 s ou esgotar a quota, devolve uma explicação por template e o UI marca-a como tal. Há cache por assinatura e língua, limite de 10 pedidos por IP em 5 minutos e corpo máximo de 1 KB. A chave `GEMINI_API_KEY` e o modelo `GEMINI_MODEL` ficam só no servidor (sem prefixo `NEXT_PUBLIC_`); sem chave, o tutor usa sempre o template. No modo demo mostra um exemplo fixo sem chamar o servidor.
 
+Depois da explicação há um chat de seguimento (`POST /api/tutor/ask`): 3 perguntas por transacção (contadas no cliente e no servidor), 300 caracteres cada, no máximo 2 trocas anteriores como contexto, com os factos da transacção e o texto da lição. Se a IA falhar, aparece "The tutor is unavailable right now" e as perguntas sugeridas respondem com texto pré-escrito. No modo demo as sugeridas têm respostas fixas e o campo livre fica desactivado.
+
 ## Limitação conhecida
 
 O quiz é verificado só no front-end. A prova de cada nível é a tarefa on-chain.
