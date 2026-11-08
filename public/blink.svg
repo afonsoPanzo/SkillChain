@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9945FF"/>
+      <stop offset="1" stop-color="#14F195"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#0E0F14"/>
+  <rect x="60" y="60" width="1080" height="510" rx="36" fill="#171922" stroke="#2A2E3B" stroke-width="3"/>
+  <rect x="60" y="60" width="1080" height="10" rx="5" fill="url(#g)"/>
+  <text x="600" y="270" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="120" font-weight="800" fill="#F2F1EC">Skill<tspan fill="#14F195">Chain</tspan></text>
+  <text x="600" y="360" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="48" fill="#C9CAD2">Learn Solana by playing</text>
+  <text x="600" y="470" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="700" fill="#A15CFF">Reach level 3 on Devnet</text>
+</svg>

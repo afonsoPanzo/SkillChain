@@ -12,6 +12,7 @@ import { getAccountAddress, getProgramId } from "@/lib/skillchain/pda";
 import { invalidateData } from "@/lib/skillchain/store";
 import { useDemo } from "@/lib/skillchain/use-demo";
 import { ProfileAvatar } from "./avatar";
+import { ChallengeButton } from "./challenge-button";
 
 function Notice({ title, sub, children }: { title: string; sub?: string; children?: React.ReactNode }) {
   return (
@@ -228,6 +229,8 @@ export function PublicProfileScreen({ address }: { address: string }) {
           </div>
         </div>
       )}
+
+      <ChallengeButton address={address} />
 
       <Verified address={address} hasNote={Boolean(note)} />
     </>
