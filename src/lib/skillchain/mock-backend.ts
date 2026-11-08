@@ -11,6 +11,7 @@ import {
   getItem,
   hasItem,
 } from "./constants";
+import { isDemoActive } from "./demo-flag";
 import { SkillChainProgramError } from "./errors";
 import type { Note, Profile, SkillChainBackend, TxContext } from "./types";
 
@@ -47,9 +48,9 @@ function seed(
   };
 }
 
-// Other players, taken from the design prototype.
-const profiles = new Map<string, Profile>(
-  [
+/** Other players, taken from the design prototype. */
+function seedProfiles(): Profile[] {
+  return [
     seed("4hTqYw8LcR3nPz6mKxD2sVbF9aJeGu1oN7iWtQ5rH2Zk", 3, 450, 1, true, true),
     seed("Bm7xR2kPqN9vTz4LcW8sYdH3eJ6fAu1oG5iKtX2nQpLs", 3, 450, 0, false, true),
     seed("7nKpX3qRmT8vLz2WcB6sYdH9eJ4fAu1oG5iNtQ7rPxMa", 3, 450, NONE, true, false),
@@ -57,9 +58,60 @@ const profiles = new Map<string, Profile>(
     seed("Hs3LpQ9xR2kNvT7mZc4WyB8dJ6eFaU1oG5iKtX3nQrPw", 2, 250, NONE, true, false),
     seed("Kc8vT2mR5xNqP9LzW3sYbH7eJ4fAu6oG1iDtX8nQpRm", 1, 100, 0, false, false),
     seed("Pw2nX7qRmK4vTz9LcB3sYdH8eJ5fAu1oG6iWtQ2rHxNb", 1, 100, NONE, false, false),
-  ].map((p) => [p.owner, p]),
-);
+  ];
+}
+
+const profiles = new Map<string, Profile>();
 const notes = new Map<string, Note>();
+
+/** Restores the seeded ranking and forgets every player and note. */
+export function resetMockState() {
+  profiles.clear();
+  notes.clear();
+  for (const p of seedProfiles()) profiles.set(p.owner, p);
+  clearPersisted();
+}
+
+// In demo mode the simulated state survives a reload (sessionStorage only).
+const STORAGE_KEY = "skillchain.demo.data";
+
+function persist() {
+  if (!isDemoActive()) return;
+  try {
+    sessionStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ profiles: [...profiles.values()], notes: [...notes.values()] }),
+    );
+  } catch {
+    // Blocked storage: progress just lasts until the next reload.
+  }
+}
+
+function clearPersisted() {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Nothing to clear.
+  }
+}
+
+function restorePersisted(): boolean {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw) as { profiles: Profile[]; notes: Note[] };
+    profiles.clear();
+    notes.clear();
+    for (const p of data.profiles) profiles.set(p.owner, p);
+    for (const n of data.notes) notes.set(n.owner, n);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+for (const p of seedProfiles()) profiles.set(p.owner, p);
+if (isDemoActive()) restorePersisted();
 
 function requireProfile(owner: string): Profile {
   const profile = profiles.get(owner);
@@ -69,6 +121,7 @@ function requireProfile(owner: string): Profile {
 
 function save(profile: Profile) {
   profiles.set(profile.owner, { ...profile });
+  persist();
 }
 
 async function send(ctx: TxContext): Promise<string> {
@@ -101,7 +154,7 @@ export const mockBackend: SkillChainBackend = {
   async initProfile(ctx) {
     if (profiles.has(ctx.owner)) throw new Error("account already in use");
     const signature = await send(ctx);
-    profiles.set(ctx.owner, {
+    save({
       owner: ctx.owner,
       level: 1,
       points: LEVEL_POINTS[0],

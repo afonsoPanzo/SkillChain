@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useWallet } from "@solana/wallet-adapter";
+import { useAccount } from "@/lib/skillchain/use-account";
 import { itemKey } from "@/i18n/translate";
 import { useT } from "@/i18n/use-t";
 import {
@@ -38,7 +38,7 @@ function Stat({ label, children }: { label: string; children: React.ReactNode })
 }
 
 export function ProfileScreen() {
-  const { connected } = useWallet();
+  const { connected } = useAccount();
   const restoring = useWalletRestoring();
   const { t } = useT();
   const { owner, profile, isLoading } = useProfile();

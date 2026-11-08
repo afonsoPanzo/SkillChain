@@ -1,4 +1,6 @@
 import { useT } from "@/i18n/use-t";
+import { useAccount } from "@/lib/skillchain/use-account";
+import { DemoExplorerNote } from "./demo-explorer-note";
 import { explorerTxUrl } from "@/lib/skillchain/format";
 import type { TxState } from "@/lib/skillchain/types";
 
@@ -20,6 +22,7 @@ function stageOf(state: TxState): number {
 /** Transaction progress: signing -> confirming -> confirmed, or an error. */
 export function TxStatus({ state }: { state: TxState }) {
   const { t } = useT();
+  const { isDemo } = useAccount();
   if (state.status === "idle") return null;
   const stage = stageOf(state);
 
@@ -45,7 +48,8 @@ export function TxStatus({ state }: { state: TxState }) {
           </div>
         );
       })}
-      {state.status === "confirmed" && (
+      {state.status === "confirmed" && isDemo && <DemoExplorerNote kind="tx" />}
+      {state.status === "confirmed" && !isDemo && (
         <a
           href={explorerTxUrl(state.signature)}
           target="_blank"

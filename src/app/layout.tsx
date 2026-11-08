@@ -5,6 +5,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/skillchain/site-header";
 import { BottomNav } from "@/components/skillchain/bottom-nav";
+import { DemoBanner } from "@/components/skillchain/demo-banner";
 
 const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
@@ -40,7 +41,10 @@ export default function RootLayout({
         <Providers>
           <div className="flex min-h-screen justify-center bg-ink">
             <div className="flex min-h-screen w-full max-w-[480px] flex-col border-x border-divider">
-              <SiteHeader />
+              <div className="sticky top-0 z-10">
+                <DemoBanner />
+                <SiteHeader />
+              </div>
               <main className="flex flex-1 flex-col gap-5 px-[18px] pt-[22px] pb-8">
                 {children}
               </main>

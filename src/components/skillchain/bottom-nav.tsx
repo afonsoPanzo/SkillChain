@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useWallet } from "@solana/wallet-adapter";
+import { useAccount } from "@/lib/skillchain/use-account";
 import { useT } from "@/i18n/use-t";
 
 const TABS = [
@@ -14,7 +14,7 @@ const TABS = [
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { connected } = useWallet();
+  const { connected } = useAccount();
   const { t } = useT();
 
   // Hidden while the player is inside a level, as in the design.

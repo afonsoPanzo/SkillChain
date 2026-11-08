@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useWallet } from "@solana/wallet-adapter";
+import { useAccount } from "@/lib/skillchain/use-account";
 import { itemKey, type TFunction } from "@/i18n/translate";
 import { useT } from "@/i18n/use-t";
 import {
@@ -46,7 +46,7 @@ function labelOf(item: ItemDef, status: ItemStatus, profile: Profile | null, t: 
 }
 
 export function ShopScreen() {
-  const { connected } = useWallet();
+  const { connected } = useAccount();
   const restoring = useWalletRestoring();
   const { t } = useT();
   const { owner, profile, isLoading } = useProfile();

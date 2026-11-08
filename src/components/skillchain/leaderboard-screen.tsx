@@ -1,6 +1,6 @@
 "use client";
 
-import { useWallet } from "@solana/wallet-adapter";
+import { useAccount } from "@/lib/skillchain/use-account";
 import { itemKey } from "@/i18n/translate";
 import { useT } from "@/i18n/use-t";
 import { shortAddress } from "@/lib/skillchain/format";
@@ -48,7 +48,7 @@ function Row({ profile, position, me }: { profile: Profile; position: number; me
 }
 
 export function LeaderboardScreen() {
-  const { connected } = useWallet();
+  const { connected } = useAccount();
   const restoring = useWalletRestoring();
   const { t } = useT();
   const { owner } = useProfile();

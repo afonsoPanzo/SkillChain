@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { TOTAL_LEVELS } from "@/lib/skillchain/constants";
 import { explorerAddressUrl, shortAddress } from "@/lib/skillchain/format";
 import { getAccountAddress } from "@/lib/skillchain/pda";
+import { useAccount } from "@/lib/skillchain/use-account";
+import { DemoExplorerNote } from "./demo-explorer-note";
 
 interface LevelDoneProps {
   level: number;
@@ -18,6 +20,7 @@ interface LevelDoneProps {
 /** Shown on entering a level that is already completed on-chain. */
 export function LevelDone({ level, title, points, owner, onReview }: LevelDoneProps) {
   const { t } = useT();
+  const { isDemo } = useAccount();
   const [profileAddress, setProfileAddress] = useState<string | null>(null);
   const [noteAddress, setNoteAddress] = useState<string | null>(null);
 
@@ -58,7 +61,9 @@ export function LevelDone({ level, title, points, owner, onReview }: LevelDonePr
           <div className="text-xs font-bold tracking-[0.06em] text-violet uppercase">
             {t("level.done.proof")}
           </div>
-          {accounts.length === 0 ? (
+          {isDemo ? (
+            <DemoExplorerNote kind="accounts" />
+          ) : accounts.length === 0 ? (
             <p className="m-0 text-[13px] text-coral-t">
               {t("level.done.mock")}
             </p>

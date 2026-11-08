@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { WalletMultiButton, useWallet } from "@solana/wallet-adapter";
+import { WalletMultiButton } from "@solana/wallet-adapter";
+import { useAccount } from "@/lib/skillchain/use-account";
 import { setLang } from "@/i18n/lang";
 import { useT } from "@/i18n/use-t";
-import { backend } from "@/lib/skillchain/backend";
+import { USE_MOCK } from "@/lib/skillchain/backend";
 import { useProfile } from "@/lib/skillchain/hooks";
 import { ProfileAvatar } from "./avatar";
 
@@ -26,7 +27,7 @@ function LanguageToggle() {
 }
 
 export function SiteHeader() {
-  const { connected } = useWallet();
+  const { connected, isDemo } = useAccount();
   const { profile } = useProfile();
   const { t } = useT();
 
@@ -46,7 +47,7 @@ export function SiteHeader() {
         <span className="rounded-full border border-violet-b px-[7px] py-[3px] font-mono text-[10px] font-semibold tracking-[0.06em] text-violet uppercase">
           Devnet
         </span>
-        {backend.isMock && (
+        {USE_MOCK && (
           <span
             className="rounded-full border border-coral-d px-[7px] py-[3px] font-mono text-[10px] font-semibold tracking-[0.06em] text-coral-t uppercase"
             title={t("header.mockTitle")}
@@ -67,7 +68,7 @@ export function SiteHeader() {
           </Link>
         )}
         <LanguageToggle />
-        {connected && <WalletMultiButton />}
+        {connected && !isDemo && <WalletMultiButton />}
       </div>
     </header>
   );

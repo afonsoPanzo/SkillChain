@@ -32,6 +32,10 @@ Requer Node 24 ou superior e a Phantom em modo Devnet. Enquanto `NEXT_PUBLIC_SKI
 
 Inglês por defeito e português como opção (botão EN/PT no cabeçalho). Dicionários em `src/i18n/` e lições em `src/content/lessons.en.json` e `lessons.pt.json`.
 
+## Modo demo
+
+Na landing, "Try without a wallet" / "Experimentar sem carteira" abre a app inteira sem Phantom nem SOL, com um jogador simulado novo (nível 0) e o ranking simulado. Usa o backend mock. O estado fica em `sessionStorage` (sobrevive a recarregamentos, não a uma nova sessão do browser). Uma faixa no topo avisa que nada vai para a blockchain; "Use a real wallet" sai do modo e apaga os dados simulados. Ligar uma carteira real durante a demo também sai do modo demo. `NEXT_PUBLIC_USE_MOCK=true` continua a forçar o mock para desenvolvimento.
+
 ## Limitação conhecida
 
 O quiz é verificado só no front-end. A prova de cada nível é a tarefa on-chain.

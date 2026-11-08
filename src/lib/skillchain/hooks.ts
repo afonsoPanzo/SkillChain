@@ -7,10 +7,10 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { useWallet } from "@solana/wallet-adapter";
 import { useT } from "../../i18n/use-t";
 import { backend } from "./backend";
 import { toUserMessage } from "./errors";
+import { useAccount } from "./use-account";
 import { getDataVersion, invalidateData, subscribeData } from "./store";
 import type { Note, Profile, TxContext, TxState } from "./types";
 
@@ -57,8 +57,7 @@ function useQuery<T>(key: string | null, fetcher: () => Promise<T>) {
 
 /** Profile of the connected wallet. `profile` is null if it does not exist yet (level 0). */
 export function useProfile() {
-  const { publicKey } = useWallet();
-  const owner = publicKey?.toBase58() ?? null;
+  const { owner } = useAccount();
   const fetcher = useCallback(
     () => (owner ? backend.getProfile(owner) : Promise.resolve(null)),
     [owner],
@@ -69,8 +68,7 @@ export function useProfile() {
 
 /** The level-3 note of the connected wallet, if it exists. */
 export function useNote() {
-  const { publicKey } = useWallet();
-  const owner = publicKey?.toBase58() ?? null;
+  const { owner } = useAccount();
   const fetcher = useCallback(
     () => (owner ? backend.getNote(owner) : Promise.resolve(null)),
     [owner],
@@ -107,7 +105,7 @@ export function useLeaderboard() {
  * Each mutation resolves with the signature, or null if it failed.
  */
 export function useSkillChain() {
-  const { publicKey, sendTransaction } = useWallet();
+  const { owner, sendTransaction } = useAccount();
   const { t } = useT();
   const [state, setState] = useState<TxState>({ status: "idle" });
   const busyRef = useRef(false);
@@ -115,7 +113,7 @@ export function useSkillChain() {
   const run = useCallback(
     async (action: (ctx: TxContext) => Promise<string>) => {
       if (busyRef.current) return null;
-      if (!publicKey) {
+      if (!owner) {
         setState({ status: "error", message: t("error.connectFirst") });
         return null;
       }
@@ -123,7 +121,7 @@ export function useSkillChain() {
       setState({ status: "signing" });
       try {
         const signature = await action({
-          owner: publicKey.toBase58(),
+          owner,
           sendTransaction,
           onConfirming: () => setState({ status: "confirming" }),
         });
@@ -138,7 +136,7 @@ export function useSkillChain() {
         busyRef.current = false;
       }
     },
-    [publicKey, sendTransaction, t],
+    [owner, sendTransaction, t],
   );
 
   const reset = useCallback(() => setState({ status: "idle" }), []);
