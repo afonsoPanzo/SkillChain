@@ -125,17 +125,17 @@ Comandos: `pnpm dev`, `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm exec vitest r
 
 ## 6. O que foi confirmado manualmente
 
-Estes pontos não podem ser provados por testes automáticos, porque dependem de serviços externos e da interface. Foram confirmados à mão pelo autor do projecto na pré-visualização da Vercel, com a chave do Gemini configurada. A equipa de desenvolvimento assistida por IA não os viu a correr: os testes automáticos simulam o modelo e o cliente de Blinks.
+Estes pontos não podem ser provados por testes automáticos, porque dependem de serviços externos e da interface. Foram verificados à mão pelo autor do projecto na pré-visualização da Vercel, com a chave do Gemini configurada. Os testes automáticos simulam o modelo e o cliente de Blinks, por isso a confirmação abaixo é o que os completa.
 
-- **Chamadas reais ao Gemini**, incluindo a recusa de perguntas fora do tema.
-- **Blinks num cliente real**, incluindo o link do inspector para a Devnet e a forma como os clientes tratam a action.
-- **O passo «Open the challenge» do Blink** (action `external-link`).
-- **A interface no browser**, incluindo a aparência e a utilização em telemóvel das páginas novas.
+| Verificação | Resultado |
+| --- | --- |
+| Abrir o Blink em `dial.to/devnet`, aceitar com uma carteira nova e ver o perfil criado | Correu bem. O cartão carregou, a transacção `init_profile` foi assinada e o perfil apareceu criado |
+| Perguntar ao tutor algo fora do tema (por exemplo, futebol) | O tutor recusou |
+| Ver a página do duelo no telemóvel | Correu bem |
 
-Os detalhes exactos dessa confirmação (por exemplo, qual o endereço do inspector que funcionou, ou se o X mostrou o cartão sem registo da action) não ficaram escritos aqui. O que o código assume é o seguinte, para consulta:
+Isto confirma na prática o link de teste do botão `https://dial.to/devnet?action=solana-action:<URL da action>` e os headers da action (`X-Blockchain-Ids: solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1`, `X-Action-Version: 2.4`).
 
-- o link de teste do botão é `https://dial.to/devnet?action=solana-action:<URL da action>`;
-- a action devolve `X-Blockchain-Ids: solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1` (Devnet) e `X-Action-Version: 2.4`.
+Não ficou registado neste documento se o Blink foi também testado no X ou se a action foi registada na Dialect. O inspector `dial.to/devnet` é o caminho confirmado para a demonstração.
 
 ## 7. Limitações conhecidas
 
