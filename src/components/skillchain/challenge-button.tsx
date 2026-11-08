@@ -2,7 +2,19 @@
 
 import { useState } from "react";
 import { useT } from "@/i18n/use-t";
+import { MAX_NAME_LENGTH, sanitizeName } from "@/lib/blink/challenge";
 import { useDemo } from "@/lib/skillchain/use-demo";
+
+const NAME_KEY = "skillchain.challengeName";
+
+/** The name remembered on this device. This component only renders after the data has loaded. */
+function readSavedName(): string {
+  try {
+    return localStorage.getItem(NAME_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
 
 /**
  * "Challenge a friend": copies the shareable challenge link and offers a link
@@ -12,10 +24,23 @@ export function ChallengeButton({ address }: { address: string }) {
   const { t, lang } = useT();
   const demo = useDemo();
   const [copied, setCopied] = useState(false);
+  const [name, setName] = useState(readSavedName);
+
+  function changeName(value: string) {
+    setName(value);
+    try {
+      localStorage.setItem(NAME_KEY, value);
+    } catch {
+      // Not remembered, still used for this link.
+    }
+  }
+
   // A simulated player does not exist on-chain, so there is nothing to challenge with.
   if (demo) return null;
 
-  const langQuery = lang === "pt" ? "&lang=pt" : "";
+  const cleanName = sanitizeName(name);
+  const langQuery =
+    (cleanName ? `&name=${encodeURIComponent(cleanName)}` : "") + (lang === "pt" ? "&lang=pt" : "");
 
   async function copy() {
     try {
@@ -37,6 +62,15 @@ export function ChallengeButton({ address }: { address: string }) {
 
   return (
     <div className="flex flex-col gap-2.5">
+      <input
+        value={name}
+        onChange={(e) => changeName(e.target.value)}
+        maxLength={MAX_NAME_LENGTH}
+        placeholder={t("blink.namePlaceholder")}
+        aria-label={t("blink.nameLabel")}
+        autoComplete="off"
+        className="h-11 rounded-xl border-[1.5px] border-line bg-surface px-3 text-[14px] text-fg outline-none"
+      />
       <button
         type="button"
         onClick={() => void copy()}

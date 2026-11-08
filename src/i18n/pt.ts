@@ -106,6 +106,8 @@ export const pt: Record<TKey, string> = {
   "blink.err.notConfigured": "O SkillChain não está disponível neste momento.",
   "blink.err.badRequest": "Pedido inválido.",
   "blink.err.rate": "Demasiados pedidos. Espera uns minutos.",
+  "blink.nameLabel": "O teu nome no desafio (opcional)",
+  "blink.namePlaceholder": "O teu nome (opcional)",
   "blink.challenge": "Desafiar um amigo",
   "blink.copied": "Ligação copiada ✓",
   "blink.hint": "Partilha a ligação: as aplicações que suportam Blinks mostram-na como um cartão que cria o perfil com um toque.",
