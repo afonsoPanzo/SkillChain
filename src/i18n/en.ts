@@ -13,6 +13,11 @@ export const en = {
   "lang.switchAria": "Switch language",
 
   // Shared
+  "demo.try": "Try without a wallet",
+  "demo.banner": "Demo mode — simulated data, nothing is on-chain",
+  "demo.useReal": "Use a real wallet",
+  "demo.noteTx": "Demo mode: with a real wallet, the actual transaction appears here with a link to Solana Explorer.",
+  "demo.noteAccounts": "Demo mode: with a real wallet, your actual on-chain accounts appear here with links to Solana Explorer.",
   "common.connect": "Connect wallet",
   "common.connecting": "Connecting wallet…",
   "common.map": "← Map",

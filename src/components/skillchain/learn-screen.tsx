@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useWallet } from "@solana/wallet-adapter";
+import { useAccount } from "@/lib/skillchain/use-account";
 import { useT } from "@/i18n/use-t";
 import { useWalletRestoring } from "@/lib/skillchain/use-wallet-restoring";
 import { TOTAL_LEVELS, TOTAL_POINTS } from "@/lib/skillchain/constants";
@@ -39,7 +39,7 @@ const CHIP_STYLE: Record<Status, string> = {
 };
 
 export function LearnScreen() {
-  const { connected } = useWallet();
+  const { connected } = useAccount();
   const { owner, profile, isLoading } = useProfile();
   const { all } = useLeaderboard();
   const restoring = useWalletRestoring();

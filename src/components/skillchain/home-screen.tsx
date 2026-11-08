@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useWallet } from "@solana/wallet-adapter";
+import { useAccount } from "@/lib/skillchain/use-account";
 import { useWalletRestoring } from "@/lib/skillchain/use-wallet-restoring";
 import { FAUCET_URL, TOTAL_LEVELS, TOTAL_POINTS } from "@/lib/skillchain/constants";
 import { useT } from "@/i18n/use-t";
+import { enterDemo } from "@/lib/skillchain/demo";
 import { ConnectButton } from "./connect-button";
 
 const LOOP = [
@@ -14,7 +15,7 @@ const LOOP = [
 ] as const;
 
 export function HomeScreen() {
-  const { connected } = useWallet();
+  const { connected } = useAccount();
   const restoring = useWalletRestoring();
   const { t } = useT();
 
@@ -53,7 +54,16 @@ export function HomeScreen() {
             {t("home.start")}
           </Link>
         ) : (
-          <ConnectButton />
+          <>
+            <ConnectButton />
+            <button
+              type="button"
+              onClick={enterDemo}
+              className="btn h-[54px] rounded-2xl border border-line bg-surface text-base font-bold text-fg hover:border-lime"
+            >
+              {t("demo.try")}
+            </button>
+          </>
         )}
         <div className="text-center text-sm text-muted">
           {t("home.faucetPre")}{" "}

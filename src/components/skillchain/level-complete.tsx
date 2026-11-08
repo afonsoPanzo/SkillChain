@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { useT } from "@/i18n/use-t";
+import { useAccount } from "@/lib/skillchain/use-account";
+import { DemoExplorerNote } from "./demo-explorer-note";
 import { TOTAL_LEVELS } from "@/lib/skillchain/constants";
 import { explorerTxUrl, shortAddress } from "@/lib/skillchain/format";
 
@@ -13,6 +15,7 @@ interface LevelCompleteProps {
 
 export function LevelComplete({ level, gain, signature, isMock }: LevelCompleteProps) {
   const { t } = useT();
+  const { isDemo } = useAccount();
   const isLast = level >= TOTAL_LEVELS;
   const href = isLast ? "/shop" : `/learn/${level + 1}`;
   const label = isLast ? t("level.complete.shop") : t("level.complete.next", { n: level + 1 });
@@ -33,7 +36,9 @@ export function LevelComplete({ level, gain, signature, isMock }: LevelCompleteP
             {t("level.complete.proof")}
           </div>
           <div className="font-mono text-[13px] break-all">{shortAddress(signature)}</div>
-          {isMock ? (
+          {isDemo ? (
+            <DemoExplorerNote kind="tx" />
+          ) : isMock ? (
             <p className="m-0 text-[13px] text-coral-t">
               {t("level.complete.mockSignature")}
             </p>

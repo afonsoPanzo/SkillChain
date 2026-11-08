@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { PublicKey } from "@solana/web3.js";
-import { useWallet } from "@solana/wallet-adapter";
 import { useT } from "@/i18n/use-t";
 import {
   BASE_FEE_LAMPORTS,
@@ -13,6 +12,8 @@ import {
 } from "@/lib/skillchain/constants";
 import { formatSol, shortAddress } from "@/lib/skillchain/format";
 import type { Lesson } from "@/lib/skillchain/lessons";
+import { DEMO_LAMPORTS } from "@/lib/skillchain/demo";
+import { useAccount } from "@/lib/skillchain/use-account";
 import { useBalance } from "@/lib/skillchain/use-balance";
 import type { TxState } from "@/lib/skillchain/types";
 import { TxStatus } from "./tx-status";
@@ -42,16 +43,20 @@ interface TaskPanelProps {
 
 /** The on-chain task of a level: create profile, send 0.01 SOL, or write a note. */
 export function TaskPanel({ lesson, pointsLabel, tx, onSubmit }: TaskPanelProps) {
-  const { publicKey } = useWallet();
+  const { publicKey, owner, isDemo } = useAccount();
   const { t, lang, formatNumber } = useT();
-  const { lamports, isLoading: balanceLoading, error: balanceError } = useBalance(publicKey);
+  const real = useBalance(publicKey);
+  // Demo mode has a simulated balance and never queries the network.
+  const lamports = isDemo ? DEMO_LAMPORTS : real.lamports;
+  const balanceLoading = !isDemo && real.isLoading;
+  const balanceError = !isDemo && real.error;
   const [recipient, setRecipient] = useState("");
   const [message, setMessage] = useState("");
 
   const type = lesson.task.type;
   const busy = tx.status === "signing" || tx.status === "confirming";
   const hasSol = lamports !== null && lamports > 0n;
-  const own = publicKey?.toBase58() ?? "";
+  const own = owner ?? "";
 
   const recipientText = recipient.trim();
   const recipientFormat = isSolanaAddress(recipientText);

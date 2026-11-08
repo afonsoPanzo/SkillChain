@@ -15,6 +15,11 @@ export const pt: Record<TKey, string> = {
   "lang.switchAria": "Mudar de idioma",
 
   // Shared
+  "demo.try": "Experimentar sem carteira",
+  "demo.banner": "Modo demo — dados simulados, nada vai para a blockchain",
+  "demo.useReal": "Usar uma carteira real",
+  "demo.noteTx": "Modo demo: com uma carteira real, aparece aqui a transacção verdadeira, com ligação ao Solana Explorer.",
+  "demo.noteAccounts": "Modo demo: com uma carteira real, aparecem aqui as tuas contas verdadeiras na blockchain, com ligações ao Solana Explorer.",
   "common.connect": "Ligar carteira",
   "common.connecting": "A ligar a carteira…",
   "common.map": "← Mapa",

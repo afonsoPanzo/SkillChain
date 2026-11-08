@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useT } from "@/i18n/use-t";
-import { useWallet } from "@solana/wallet-adapter";
+import { useAccount } from "@/lib/skillchain/use-account";
 import { useWalletRestoring } from "@/lib/skillchain/use-wallet-restoring";
 import { backend } from "@/lib/skillchain/backend";
 import { useProfile, useSkillChain } from "@/lib/skillchain/hooks";
@@ -23,7 +23,7 @@ function Notice({ title, children }: { title: string; children: React.ReactNode 
 }
 
 export function LevelScreen({ level }: { level: number }) {
-  const { connected } = useWallet();
+  const { connected } = useAccount();
   const { owner, profile, isLoading } = useProfile();
   const [reviewing, setReviewing] = useState(false);
   const sc = useSkillChain();
