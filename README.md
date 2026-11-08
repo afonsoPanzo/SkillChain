@@ -11,6 +11,7 @@ Solana Hackathon (MLH), 6 a 8 de Novembro de 2026 · Rede: Devnet.
 - [SDD.md](SDD.md): especificação completa (fonte de verdade).
 - [skillchain-mvp.md](skillchain-mvp.md): visão geral do MVP.
 - [PROGRESSO.md](PROGRESSO.md): o que já foi feito, decisões e pendentes.
+- [FUNCIONALIDADES.md](FUNCIONALIDADES.md): as funcionalidades acrescentadas (demo, perfil público, tutor de IA, Blink, speedrun), como funcionam e o que falta confirmar.
 - [design/](design/): protótipo visual e screenshots.
 
 ## Stack
