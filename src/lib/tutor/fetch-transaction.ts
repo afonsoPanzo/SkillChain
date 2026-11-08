@@ -32,3 +32,25 @@ export async function fetchTransaction(signature: string): Promise<RawTransactio
   }
   return null;
 }
+
+/** Successful signatures that touched `address`, newest first (up to 1000). */
+export async function listSignatures(address: string): Promise<string[]> {
+  const response = await fetch(DEVNET_RPC, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "getSignaturesForAddress",
+      params: [address, { limit: 1000, commitment: "confirmed" }],
+    }),
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!response.ok) throw new Error(`RPC error ${response.status}`);
+  const json = (await response.json()) as {
+    result?: { signature: string; err: unknown }[];
+    error?: unknown;
+  };
+  if (json.error || !json.result) throw new Error("RPC returned an error");
+  return json.result.filter((entry) => !entry.err).map((entry) => entry.signature);
+}
