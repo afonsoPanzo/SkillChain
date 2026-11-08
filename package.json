@@ -40,6 +40,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@google/genai": "^3.0.0",
     "@solana-program/token": "^0.18.0",
     "@solana/kit": "^8.5.0",
     "@solana/wallet-adapter": "^3.1.0",
