@@ -8,6 +8,7 @@ import { explorerAddressUrl, shortAddress } from "@/lib/skillchain/format";
 import { getAccountAddress } from "@/lib/skillchain/pda";
 import { useAccount } from "@/lib/skillchain/use-account";
 import { DemoExplorerNote } from "./demo-explorer-note";
+import { ChallengeButton } from "./challenge-button";
 import { TutorCard } from "./tutor-card";
 
 interface LevelDoneProps {
@@ -87,6 +88,11 @@ export function LevelDone({ level, title, points, owner, onReview }: LevelDonePr
         </div>
 
         <TutorCard owner={owner} level={level} />
+        {isLast && (
+          <div className="w-full text-left">
+            <ChallengeButton address={owner} />
+          </div>
+        )}
       </div>
       <div className="flex flex-col gap-3">
         <Link href={isLast ? "/shop" : `/learn/${level + 1}`} className="btn btn-primary">

@@ -10,6 +10,7 @@ import {
 import { useT } from "../../i18n/use-t";
 import { backend } from "./backend";
 import { toUserMessage } from "./errors";
+import { loadRun, loadSpeedrunBoard, type RunResult } from "../speedrun/run";
 import { useAccount } from "./use-account";
 import { getDataVersion, invalidateData, subscribeData } from "./store";
 import type { Note, Profile, TxContext, TxState } from "./types";
@@ -85,6 +86,29 @@ export function useProfile() {
 export function useNote() {
   const { owner } = useAccount();
   return useNoteOf(owner);
+}
+
+/** The speedrun of any address (start, end, time), read from the blockchain. */
+export function useRun(address: string | null) {
+  const fetcher = useCallback(
+    () => (address ? loadRun(backend, address) : Promise.resolve(null)),
+    [address],
+  );
+  const { data, isLoading, error } = useQuery<RunResult | null>(
+    address ? `run:${address}` : null,
+    fetcher,
+  );
+  return { run: data, isLoading, error };
+}
+
+/** The fastest finished runs, timed on-chain. */
+export function useSpeedrunBoard() {
+  const fetcher = useCallback(
+    async () => loadSpeedrunBoard(backend, await backend.listProfiles()),
+    [],
+  );
+  const { data, isLoading, error } = useQuery<RunResult[]>("speedrun", fetcher);
+  return { runs: data ?? [], isLoading, error };
 }
 
 /** Level desc, then total earned desc. */

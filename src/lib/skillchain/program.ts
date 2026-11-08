@@ -18,10 +18,11 @@ import {
   encodeU8Arg,
   profileFilters,
 } from "./codec";
+import { readRunInfo } from "../speedrun/chain-run";
 import { SkillChainProgramError, describeTxError } from "./errors";
 import { deriveAddress } from "./pda";
 import { getConnection } from "./rpc";
-import type { Note, Profile, SkillChainBackend, TxContext } from "./types";
+import type { Note, Profile, RunInfo, SkillChainBackend, TxContext } from "./types";
 
 export function createProgramBackend(programIdBase58: string): SkillChainBackend {
   const programId = new PublicKey(programIdBase58);
@@ -67,6 +68,9 @@ export function createProgramBackend(programIdBase58: string): SkillChainBackend
     return { player, profile, keys };
   }
 
+  // A run's start and end never change once found, so they are read only once.
+  const runCache = new Map<string, RunInfo>();
+
   const ix = (keys: AccountMeta[], data: Uint8Array) =>
     new TransactionInstruction({ programId, keys, data });
 
@@ -89,6 +93,21 @@ export function createProgramBackend(programIdBase58: string): SkillChainBackend
         filters: profileFilters(),
       });
       return accounts.map(({ account }) => decodeProfile(account.data));
+    },
+
+    async getRunInfo(owner, includeEnd = true): Promise<RunInfo | null> {
+      const cached = runCache.get(owner);
+      if (cached && (!includeEnd || cached.endSignature)) return cached;
+      const player = new PublicKey(owner);
+      const info = await readRunInfo(
+        getConnection(),
+        programId,
+        await pda("profile", player),
+        await pda("note", player),
+        includeEnd,
+      );
+      if (info && (!includeEnd || info.endSignature)) runCache.set(owner, info);
+      return info;
     },
 
     async initProfile(ctx) {

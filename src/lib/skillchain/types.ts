@@ -20,6 +20,18 @@ export interface Note {
   createdAt: number;
 }
 
+/**
+ * When and with which transactions a wallet's run began and ended, read from
+ * the blockchain. The end time itself is the note's created_at.
+ */
+export interface RunInfo {
+  /** Unix seconds of the first successful init_profile transaction. */
+  startTime: number;
+  startSignature: string;
+  /** Signature of the complete_level_3 transaction, once the note exists. */
+  endSignature: string | null;
+}
+
 export type TxPhase = "signing" | "confirming";
 
 export type TxState =
@@ -50,6 +62,8 @@ export interface SkillChainBackend {
   getProfile(owner: string): Promise<Profile | null>;
   getNote(owner: string): Promise<Note | null>;
   listProfiles(): Promise<Profile[]>;
+  /** Start (and optionally end) transaction of a wallet's run, or null if it has no profile. */
+  getRunInfo(owner: string, includeEnd?: boolean): Promise<RunInfo | null>;
   initProfile(ctx: TxContext): Promise<string>;
   completeLevel2(ctx: TxContext, recipient: string): Promise<string>;
   completeLevel3(ctx: TxContext, message: string): Promise<string>;

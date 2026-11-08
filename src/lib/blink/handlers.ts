@@ -4,10 +4,12 @@ import { RateLimiter, clientIp } from "../tutor/limits";
 import {
   buildChallengeMetadata,
   buildInitProfileTransaction,
+  buildNextAction,
   langFromParam,
   refFromParam,
   sanitizeName,
   type ChallengeChain,
+  type RunSummary,
 } from "./challenge";
 import { actionError, actionPreflight, actionResponse } from "./headers";
 
@@ -17,31 +19,49 @@ export interface ChallengeDeps {
   chain: ChallengeChain;
   /** Program ID, or an empty string while it is not configured. */
   programId: () => string;
+  /** The challenger's run, for the card text. A failure falls back to the generic text. */
+  describeRun?: (owner: string) => Promise<RunSummary | null>;
   limiter?: RateLimiter;
 }
 
-/** GET, POST and OPTIONS of the challenge action, with injectable dependencies. */
+/** The challenger: from the path (/challenge/<address>) or the older ?ref= parameter. */
+function challengerOf(url: URL, from?: string): string | null {
+  return refFromParam(from ?? url.searchParams.get("ref"));
+}
+
+/** GET, POST, OPTIONS and the external-link step of the challenge action, with injectable dependencies. */
 export function createChallengeHandlers({
   chain,
   programId,
+  describeRun,
   limiter = new RateLimiter(20),
 }: ChallengeDeps) {
   return {
-    GET(request: Request): Response {
+    async GET(request: Request, from?: string): Promise<Response> {
       const url = new URL(request.url);
       const lang = langFromParam(url.searchParams.get("lang"));
-      const ref = refFromParam(url.searchParams.get("ref"));
+      const ref = challengerOf(url, from);
       const name = sanitizeName(url.searchParams.get("name"));
-      return actionResponse(buildChallengeMetadata(url.origin, lang, ref, name));
+
+      let run: RunSummary | null = null;
+      if (ref && describeRun) {
+        try {
+          run = await describeRun(ref);
+        } catch (err) {
+          console.warn("[blink] run unavailable:", err instanceof Error ? err.message : "unknown");
+        }
+      }
+      return actionResponse(buildChallengeMetadata(url.origin, lang, ref, name, run));
     },
 
     OPTIONS(): Response {
       return actionPreflight();
     },
 
-    async POST(request: Request): Promise<Response> {
+    async POST(request: Request, from?: string): Promise<Response> {
       const url = new URL(request.url);
-      const t = makeT(langFromParam(url.searchParams.get("lang")));
+      const lang = langFromParam(url.searchParams.get("lang"));
+      const t = makeT(lang);
 
       if (!limiter.allow(clientIp(request.headers))) return actionError(t("blink.err.rate"), 429);
 
@@ -68,11 +88,26 @@ export function createChallengeHandlers({
         }
         const blockhash = await chain.latestBlockhash();
         const transaction = await buildInitProfileTransaction(account, program, blockhash);
-        return actionResponse({ type: "transaction", transaction, message: t("blink.message") });
+        return actionResponse({
+          type: "transaction",
+          transaction,
+          message: t("blink.message"),
+          links: { next: buildNextAction(url.origin, lang, challengerOf(url, from)) },
+        });
       } catch (err) {
         console.warn("[blink] failed:", err instanceof Error ? err.message : "unknown");
         return actionError(t("blink.err.rpc"), 502);
       }
+    },
+
+    /** After the transaction: an external link to the challenge page on the site. */
+    async OPEN(request: Request): Promise<Response> {
+      const url = new URL(request.url);
+      const lang = langFromParam(url.searchParams.get("lang"));
+      const ref = refFromParam(url.searchParams.get("ref"));
+      const page = ref ? `/challenge/${ref}` : "/challenge";
+      const query = lang === "en" ? "" : `?lang=${lang}`;
+      return actionResponse({ type: "external-link", externalLink: `${url.origin}${page}${query}` });
     },
   };
 }

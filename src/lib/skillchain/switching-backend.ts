@@ -18,6 +18,7 @@ export function createSwitchingBackend(
     getProfile: (owner) => current().getProfile(owner),
     getNote: (owner) => current().getNote(owner),
     listProfiles: () => current().listProfiles(),
+    getRunInfo: (owner, includeEnd) => current().getRunInfo(owner, includeEnd),
     initProfile: (ctx) => current().initProfile(ctx),
     completeLevel2: (ctx, recipient) => current().completeLevel2(ctx, recipient),
     completeLevel3: (ctx, message) => current().completeLevel3(ctx, message),

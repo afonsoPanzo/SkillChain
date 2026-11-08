@@ -48,6 +48,10 @@ Nos níveis já concluídos (sem assinatura à mão), `POST /api/tutor/find` pro
 
 `/api/actions/challenge` é uma Solana Action (spec 2.x, Devnet, `X-Blockchain-Ids: solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1`): o GET devolve o cartão, o POST devolve a transacção `init_profile` sem assinar (fee payer = conta, blockhash recente) ou um erro amigável se a conta já tem perfil. `/actions.json` mapeia `/challenge` para a action. O link a partilhar é `/challenge?ref=<endereço>` (`&lang=pt` para português); quem não tem cliente com Blinks vê a página `/challenge`. Os botões "Challenge a friend" estão em `/profile` e `/u/[address]`.
 
+## Speedrun e duelos
+
+"Challenge a friend" partilha `/challenge/<endereço>`: quem completa os 3 níveis mais depressa. O tempo vem só da blockchain: início = `blockTime` da primeira transacção `InitProfile` na conta do perfil (verificada pelos logs do programa, para uma transferência avulsa para o PDA não contar), fim = `created_at` da conta Note. `/challenge/<a>/<b>` compara dois jogadores com links do Explorer para as transacções de início e de fim, e o ranking tem um separador "Speedrun" com os 10 tempos mais rápidos (o cálculo está em `src/lib/speedrun/run.ts`). O Blink usa o mesmo texto (`<quem> finished SkillChain in 6m 42s — can you beat it?`) e, depois de aceitar, tem um passo "Open the challenge" que leva à página. No modo demo há tempos simulados.
+
 ## Limitação conhecida
 
 O quiz é verificado só no front-end. A prova de cada nível é a tarefa on-chain.

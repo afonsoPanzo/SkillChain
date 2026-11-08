@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useT } from "@/i18n/use-t";
 import { MAX_NAME_LENGTH, sanitizeName } from "@/lib/blink/challenge";
@@ -17,8 +18,9 @@ function readSavedName(): string {
 }
 
 /**
- * "Challenge a friend": copies the shareable challenge link and offers a link
- * to open the same action in a Blinks inspector on Devnet.
+ * "Challenge a friend": copies the link to the speedrun challenge
+ * (/challenge/<address>) and offers a link to open the same action as a Blink
+ * in an inspector on Devnet.
  */
 export function ChallengeButton({ address }: { address: string }) {
   const { t, lang } = useT();
@@ -35,28 +37,25 @@ export function ChallengeButton({ address }: { address: string }) {
     }
   }
 
-  // A simulated player does not exist on-chain, so there is nothing to challenge with.
-  if (demo) return null;
-
   const cleanName = sanitizeName(name);
-  const langQuery =
-    (cleanName ? `&name=${encodeURIComponent(cleanName)}` : "") + (lang === "pt" ? "&lang=pt" : "");
+  const query = new URLSearchParams();
+  if (cleanName) query.set("name", cleanName);
+  if (lang === "pt") query.set("lang", "pt");
+  const suffix = query.size ? `?${query.toString()}` : "";
 
   async function copy() {
     try {
-      await navigator.clipboard.writeText(
-        `${window.location.origin}/challenge?ref=${address}${langQuery}`,
-      );
+      await navigator.clipboard.writeText(`${window.location.origin}/challenge/${address}${suffix}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
-      // Clipboard blocked: the inspector link below still works.
+      // Clipboard blocked: the other links below still work.
     }
   }
 
   // The inspector fetches the action API itself, so it gets the API URL.
   function inspectorUrl(): string {
-    const action = `${window.location.origin}/api/actions/challenge?ref=${address}${langQuery}`;
+    const action = `${window.location.origin}/api/actions/challenge/${address}${suffix}`;
     return `https://dial.to/devnet?action=solana-action:${encodeURIComponent(action)}`;
   }
 
@@ -80,15 +79,19 @@ export function ChallengeButton({ address }: { address: string }) {
       </button>
       <div className="text-[13px] text-muted">
         {t("blink.hint")}{" "}
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            window.open(inspectorUrl(), "_blank", "noopener,noreferrer");
-          }}
-        >
-          {t("blink.test")}
-        </a>
+        {demo ? (
+          <Link href={`/challenge/${address}${suffix}`}>{t("challenge.openDuel")}</Link>
+        ) : (
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              window.open(inspectorUrl(), "_blank", "noopener,noreferrer");
+            }}
+          >
+            {t("blink.test")}
+          </a>
+        )}
       </div>
     </div>
   );

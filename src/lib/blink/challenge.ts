@@ -10,6 +10,7 @@ import { isSolanaAddress } from "../skillchain/address";
 import { encodeNoArgs } from "../skillchain/codec";
 import { shortAddress } from "../skillchain/format";
 import { deriveAddress } from "../skillchain/pda";
+import { formatDuration } from "../speedrun/run";
 
 /** Path of the action API, relative to the site. */
 export const CHALLENGE_PATH = "/api/actions/challenge";
@@ -49,27 +50,58 @@ export function challengerLabel(ref: string | null, name: string | null): string
   return ref ? shortAddress(ref) : null;
 }
 
+/** What the Blink card says about the challenger's run. */
+export interface RunSummary {
+  status: "none" | "running" | "finished";
+  level: number;
+  durationSeconds: number | null;
+}
+
+/** Path of the action for a challenger; the address is part of the path, as in the shared link. */
+export function actionPath(ref: string | null): string {
+  return ref ? `${CHALLENGE_PATH}/${ref}` : CHALLENGE_PATH;
+}
+
+function withQuery(path: string, name: string | null, lang: Lang): string {
+  const query = new URLSearchParams();
+  if (name) query.set("name", name);
+  if (lang !== DEFAULT_LANG) query.set("lang", lang);
+  const queryString = query.toString();
+  return queryString ? `${path}?${queryString}` : path;
+}
+
+/** The same sentence the /challenge/<address> page shows. */
+function runDescription(lang: Lang, who: string, run: RunSummary): string {
+  const t = makeT(lang);
+  if (run.status === "finished" && run.durationSeconds !== null) {
+    return t("challenge.run.finished", { who, time: formatDuration(run.durationSeconds) });
+  }
+  if (run.status === "running") return t("challenge.run.running", { who, level: run.level });
+  return t("challenge.run.none", { who });
+}
+
 /** Metadata shown by a Blink client (ActionGetResponse). */
 export function buildChallengeMetadata(
   origin: string,
   lang: Lang,
   ref: string | null,
   name: string | null = null,
+  run: RunSummary | null = null,
 ) {
   const t = makeT(lang);
   const who = challengerLabel(ref, name);
-  const query = new URLSearchParams();
-  if (ref) query.set("ref", ref);
-  if (name) query.set("name", name);
-  if (lang !== DEFAULT_LANG) query.set("lang", lang);
-  const queryString = query.toString();
-  const href = queryString ? `${CHALLENGE_PATH}?${queryString}` : CHALLENGE_PATH;
+  const href = withQuery(actionPath(ref), name, lang);
   const label = t("blink.label");
   return {
     type: "action" as const,
     icon: `${origin}/blink.svg`,
     title: t("blink.title"),
-    description: who ? t("blink.description.ref", { ref: who }) : t("blink.description"),
+    description:
+      who && run
+        ? runDescription(lang, who, run)
+        : who
+          ? t("blink.description.ref", { ref: who })
+          : t("blink.description"),
     label,
     links: { actions: [{ type: "transaction" as const, href, label }] },
   };
@@ -102,6 +134,34 @@ export async function buildInitProfileTransaction(
   }).add(instruction);
   const bytes = await tx.serialize({ requireAllSignatures: false, verifySignatures: false });
   return Buffer.from(bytes).toString("base64");
+}
+
+/** Step shown after the friend signs: it opens the challenge page on the site. */
+export function buildNextAction(origin: string, lang: Lang, ref: string | null) {
+  const t = makeT(lang);
+  const query = new URLSearchParams();
+  if (ref) query.set("ref", ref);
+  if (lang !== DEFAULT_LANG) query.set("lang", lang);
+  const queryString = query.toString();
+  return {
+    type: "inline" as const,
+    action: {
+      type: "action" as const,
+      icon: `${origin}/blink.svg`,
+      title: t("blink.title"),
+      description: t("blink.next.description"),
+      label: t("blink.next.label"),
+      links: {
+        actions: [
+          {
+            type: "external-link" as const,
+            href: queryString ? `${CHALLENGE_PATH}/open?${queryString}` : `${CHALLENGE_PATH}/open`,
+            label: t("blink.next.label"),
+          },
+        ],
+      },
+    },
+  };
 }
 
 /** The Devnet reads the POST needs. Injected so it can be tested. */
